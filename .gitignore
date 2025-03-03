@@ -1,0 +1,27 @@
+# Ignore environment and configuration files
+.env
+.env.backup
+.env.production
+docker-compose.override.yml
+
+# Ignore Docker database volume
+Docker/DB/volume/
+Docker/DB/my.cnf
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore JetBrains and VSCode settings
+/.idea/
+/.vscode/
+/.fleet/
+/.zed/
+
+# Ignore log files
+npm-debug.log
+yarn-error.log
+
+# Ignore Laravel storage (outside src)
+/storage/*.key
+/storage/pail

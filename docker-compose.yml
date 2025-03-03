@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+  app:
+    build: ./Docker/App
+    container_name: laravel_app
+    # restart: always
+    # working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+    ports:
+      - "8000:80"
+    # depends_on:
+    #   - db
+    # networks:
+    #   - lamp_network
+
+  db:
+    image: mysql:8
+    container_name: laravel_db
+    # restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laraveldb
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: dbpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./Docker/DB/volume:/var/lib/mysql
+      - ./Docker/DB/my.cnf:/etc/mysql/my.cnf
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    # networks:
+    #   - lamp_network
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: laravel_phpmyadmin
+    hostname: phpmyadmin
+    restart: always
+    ports:
+      - "8088:80"
+    # environment:
+    #   PMA_HOST: db
+    #   MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - db
+    # networks:
+    #   - lamp_network
+
+# networks:
+#   lamp_network:
