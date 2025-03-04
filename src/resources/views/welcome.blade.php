@@ -3,6 +3,12 @@
 @section('title', 'Home Communication')
 
 @section('content')
+
+@if(session('success'))
+    <div class="alert alert-success text-center">
+        {{ session('success') }}
+    </div>
+@endif
     <div class="row">
         <div class="col-md-3">
             <img src="https://via.placeholder.com/150" class="img-fluid" alt="ユーザー画像">

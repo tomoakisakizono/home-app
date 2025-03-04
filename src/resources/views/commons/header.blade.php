@@ -23,10 +23,11 @@
             <ul class="navbar-nav ms-auto">
                 @if(Auth::check())
                 <li class="nav-item"><a class="nav-link text-white" href="#">{{ Auth::user()->name }}</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="#">ログアウト</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="#">マイページ</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="{{ route('logout') }}">ログアウト</a></li>
                 @else
                 <li class="nav-item"><a class="nav-link text-white" href="{{ route('register.form') }}">新規ユーザ登録</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="#">ログイン</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="{{ route('login.form') }}">ログイン</a></li>
                 @endif
             </ul>
         </div>

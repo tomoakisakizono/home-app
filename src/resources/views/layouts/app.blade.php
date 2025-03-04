@@ -23,5 +23,15 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/cf5eb7ebd9.js" crossorigin="anonymous"></script>
+    <script>
+        setTimeout(function() {
+            let alertBox = document.getElementById('success-alert');
+            if (alertBox) {
+                alertBox.style.transition = "opacity 0.5s ease";
+                alertBox.style.opacity = "0";
+                setTimeout(() => alertBox.remove(), 500);
+            }
+        }, 20000);
+    </script>
 </body>
 </html>
