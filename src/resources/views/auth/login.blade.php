@@ -36,7 +36,6 @@
 
         <div class="d-flex justify-content-between mb-3">
             <button type="submit" class="btn btn-primary">ログイン</button>
-            <a href="{{ route('home') }}" class="btn btn-secondary">戻る</a>
         </div>
     </form>
 </div>
