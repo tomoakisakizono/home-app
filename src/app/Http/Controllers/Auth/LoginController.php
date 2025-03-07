@@ -22,9 +22,13 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->route('home')->with('success', 'ログインしました！');
+            // ログイン成功後に Auth::id() が null でないか確認
+            $userId = Auth::id();
+            if (!$userId) {
+                return back()->withErrors(['email' => 'ログイン後にエラーが発生しました。']);
+            }
+            return redirect()->route('users.show', ['id' => $userId])->with('success', 'ログインしました！');
         }
-
         return back()->withErrors(['email' => 'メールアドレスまたはパスワードが正しくありません。']);
     }
 }
