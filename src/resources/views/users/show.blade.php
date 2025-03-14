@@ -15,12 +15,11 @@
         </div>
         <div class="col-md-9">
 
-            <div class="d-flex justify-content-between">
-                <div class="card p-3">
-                    <h5>ユーザーネーム</h5>
-                    <p>ペアネーム: XXXX夫婦</p>
-                    <p>Email: sample@sumple.com</p>
-                    <p>ステータス: Active</p>
+            <div class="d-flex justify-content-between ">
+                <div class="card p-3 text-left">
+                    <h5 class="card-title">ユーザーネーム:<br>{{ $user->name }}</h5>
+                    <h5 class="card-body">アドレス:<br>{{ $user->email }}</h5>
+                    <h5 class="card-body">ペアネーム:<br>XXXX夫婦</h5>
                 </div>
 
                 <div class="align-self-center">
