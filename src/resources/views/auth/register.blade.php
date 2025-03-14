@@ -36,7 +36,7 @@
 
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary w-50 mt-3 mb-5">登録</button>
-            <a href="{{ route('login.form') }}" class="btn btn-secondary w-50 mt-3 mb-5">戻る</a>
+            <a href="{{ route('login') }}" class="btn btn-secondary w-50 mt-3 mb-5">戻る</a>
         </div>        
     </form>
 </div>

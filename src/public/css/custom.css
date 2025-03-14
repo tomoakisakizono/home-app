@@ -1,0 +1,10 @@
+@media (max-width: 768px) {
+    .pair-info {
+        font-size: 12px !important;
+        white-space: nowrap;
+    }
+}
+
+.text-left {
+    text-align: left !important;
+}

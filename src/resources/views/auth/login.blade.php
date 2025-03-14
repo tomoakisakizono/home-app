@@ -12,7 +12,8 @@
         </div>
     @endif
 
-    @if($errors->any())
+    @include('commons.error_messages')
+    <!-- @if($errors->any())
         <div class="alert alert-danger">
             <ul>
                 @foreach($errors->all() as $error)
@@ -20,7 +21,7 @@
                 @endforeach
             </ul>
         </div>
-    @endif
+    @endif -->
 
     <form action="{{ route('login.store') }}" method="POST">
         @csrf
