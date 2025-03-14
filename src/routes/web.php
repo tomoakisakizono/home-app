@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\PairController;
+use App\Http\Controllers\FunctionController;
 
 // ユーザ登録
 Route::get('/register', [RegisterController::class, 'showForm'])->name('register.form');
@@ -26,5 +27,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pair/setup', [PairController::class, 'setup'])->name('pair.setup');
     Route::post('/pair/invite', [PairController::class, 'invite'])->name('pair.invite');
     Route::post('/pair/accept', [PairController::class, 'accept'])->name('pair.accept');
+    Route::get('/pair/edit', [PairController::class, 'edit'])->name('pair.edit');
+    Route::post('/pair/update_image', [PairController::class, 'updateImage'])->name('pair.update_image');
+    Route::post('/pair/update_name', [PairController::class, 'updateName'])->name('pair.update_name');
+    Route::get('/pair/functions', [FunctionController::class, 'index'])->name('pair.functions');
+    Route::post('/pair/functions/store', [FunctionController::class, 'store'])->name('pair.functions.store');
     Route::post('/pair/decline/{pair_id}', [PairController::class, 'decline'])->name('pair.decline');
 });

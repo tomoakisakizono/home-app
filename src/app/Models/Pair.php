@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Pair extends Model
 {
     use HasFactory;
 
     // 🔹 `invite_code` を `$fillable` に追加
-    protected $fillable = ['user1_id', 'user2_id', 'invite_code', 'status'];
+    protected $fillable = ['user1_id', 'user2_id', 'invite_code', 'status', 'pair_name', 'pair_image'];
 
     /**
      * ユーザー1のリレーション
@@ -49,5 +50,13 @@ class Pair extends Model
     public function hasAccepted()
     {
         return $this->status === 'accepted' && $this->user2_id !== null;
+    }
+
+    /**
+     * **ペア画像の取得（デフォルト画像設定）**
+     */
+    public function getImageUrl()
+    {
+        return $this->pair_image ? Storage::url($this->pair_image) : asset('images/default_pair.png');
     }
 }
