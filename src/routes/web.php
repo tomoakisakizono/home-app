@@ -9,6 +9,8 @@ use App\Http\Controllers\PairController;
 use App\Http\Controllers\FunctionController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\ShoppingListController;
+use App\Http\Controllers\CategoryController;
 
 // ユーザ登録
 Route::get('/register', [RegisterController::class, 'showForm'])->name('register.form');
@@ -48,4 +50,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/calendar/{id}/edit', [CalendarController::class, 'edit'])->name('calendar.edit'); // 予定編集フォーム
     Route::put('/calendar/{id}', [CalendarController::class, 'update'])->name('calendar.update'); // 予定更新
     Route::delete('/calendar/{id}', [CalendarController::class, 'destroy'])->name('calendar.destroy'); // 予定削除
+
+    Route::get('/shopping', [ShoppingListController::class, 'index'])->name('shopping.index');
+    Route::post('/shopping', [ShoppingListController::class, 'store'])->name('shopping.store');
+    Route::post('/shopping/{id}/status', [ShoppingListController::class, 'updateStatus'])->name('shopping.updateStatus');
+    Route::delete('/shopping/{id}', [ShoppingListController::class, 'destroy'])->name('shopping.destroy');
+
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+
 });

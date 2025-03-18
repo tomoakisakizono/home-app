@@ -28,7 +28,7 @@
 </form>
 
 <!-- 🔹 メッセージ一覧 -->
-<ul class="list-group mt-4">
+<ul class="list-group mt-4 mb-4">
     @foreach($messages as $message)
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <div>

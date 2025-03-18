@@ -61,8 +61,8 @@
                     <li><a class="dropdown-item function-option" href="#" data-value="メッセージ">メッセージ</a></li>
                     <li><a class="dropdown-item function-option" href="#" data-value="カレンダー">カレンダー</a></li>
                     <li><a class="dropdown-item function-option" href="#" data-value="買い物リスト">買い物リスト</a></li>
-                    <li><a class="dropdown-item function-option" href="#" data-value="家計簿">家計簿</a></li>
                     <li><a class="dropdown-item function-option" href="#" data-value="写真">写真</a></li>
+                    <li><a class="dropdown-item function-option" href="#" data-value="動画">動画</a></li>
                     <li><a class="dropdown-item function-option" href="#" data-value="作業リスト">作業リスト</a></li>
                 </ul>
             </div>
@@ -110,36 +110,44 @@
         </a>
     </div>
     <div class="col-md-2">
-    <a href="{{ route('calendar.index') }}" class="text-decoration-none">
-        <div class="card p-3 text-center">
-            <h5 class="mb-2">カレンダー</h5>
-            <i class="fa-regular fa-calendar fa-2x"></i>
-        </div>
-    </a>
+        <a href="{{ route('calendar.index') }}" class="text-decoration-none">
+            <div class="card p-3 text-center">
+                <h5 class="mb-2">カレンダー</h5>
+                <i class="fa-regular fa-calendar fa-2x"></i>
+            </div>
+        </a>
     </div>
     <div class="col-md-2">
-        <div class="card p-3">
-            <h5>買い物</h5>
-            <i class="fa-regular fa-file"></i>
-        </div>
+        <a href="{{ route('shopping.index') }}" class="text-decoration-none">
+            <div class="card p-3 text-center">
+                <h5 class="mb-2">買い物</h5>
+                <i class="fa-regular fa-file fa-2x"></i>
+            </div>
+        </a>
     </div>
     <div class="col-md-2">
-        <div class="card p-3">
-            <h5>家計簿</h5>
-            <i class="fa-regular fa-pen-to-square"></i>
-        </div>
+        <a href="#" class="text-decoration-none">
+            <div class="card p-3 text-center">
+                <h5>写真</h5>
+                <i class="fa-regular fa-images fa-2x"></i>
+            </div>
+        </a>
     </div>
     <div class="col-md-2">
-        <div class="card p-3">
-            <h5>写真</h5>
-            <i class="fa-regular fa-images"></i>
-        </div>
+        <a href="#" class="text-decoration-none">
+            <div class="card p-3 text-center">
+                <h5>動画</h5>
+                <i class="fa-regular fa-pen-to-square fa-2x"></i>
+            </div>
+        </a>
     </div>
     <div class="col-md-2">
-        <div class="card p-3">
-            <h5>作業リスト</h5>
-            <i class="fa-regular fa-rectangle-list"></i>
-        </div>
+        <a href="#" class="text-decoration-none">
+            <div class="card p-3 text-center">
+                <h5>作業リスト</h5>
+                <i class="fa-regular fa-rectangle-list fa-2x"></i>
+            </div>
+        </a>
     </div>
 </div>
 

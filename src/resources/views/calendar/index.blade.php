@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container mb-4">
     <h2 class="text-center my-3"><i class="fa-regular fa-calendar"></i> カレンダー</h2>
 
     <!-- カレンダー表示 -->
