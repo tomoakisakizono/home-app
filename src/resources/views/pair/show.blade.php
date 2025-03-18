@@ -102,16 +102,20 @@
 <h3 class="text-center mt-5">メインメニュー</h3>
 <div class="row text-center mt-2 mb-4">
     <div class="col-md-2">
-        <div class="card p-3">
-            <h5>メッセージ</h5>
-            <i class="fa-regular fa-envelope"></i>
-        </div>
+        <a href="{{ route('messages.index') }}" class="text-decoration-none">
+            <div class="card p-3 text-center">
+                <h5 class="mb-2">メッセージ</h5>
+                <i class="fa-regular fa-envelope fa-2x"></i>
+            </div>
+        </a>
     </div>
     <div class="col-md-2">
-        <div class="card p-3">
-            <h5>カレンダー</h5>
-            <i class="fa-regular fa-calendar"></i>
+    <a href="{{ route('calendar.index') }}" class="text-decoration-none">
+        <div class="card p-3 text-center">
+            <h5 class="mb-2">カレンダー</h5>
+            <i class="fa-regular fa-calendar fa-2x"></i>
         </div>
+    </a>
     </div>
     <div class="col-md-2">
         <div class="card p-3">

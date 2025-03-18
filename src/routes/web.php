@@ -7,6 +7,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\PairController;
 use App\Http\Controllers\FunctionController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\CalendarController;
 
 // ユーザ登録
 Route::get('/register', [RegisterController::class, 'showForm'])->name('register.form');
@@ -33,4 +35,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pair/functions', [FunctionController::class, 'index'])->name('pair.functions');
     Route::post('/pair/functions/store', [FunctionController::class, 'store'])->name('pair.functions.store');
     Route::post('/pair/decline/{pair_id}', [PairController::class, 'decline'])->name('pair.decline');
+
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index'); // メッセージ一覧
+    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store'); // メッセージ投稿
+    Route::get('/messages/{id}/edit', [MessageController::class, 'edit'])->name('messages.edit'); // 編集ページ
+    Route::put('/messages/{id}', [MessageController::class, 'update'])->name('messages.update'); // メッセージ更新
+    Route::delete('/messages/{id}', [MessageController::class, 'destroy'])->name('messages.destroy'); // メッセージ削除
+
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index'); // カレンダー表示
+    Route::post('/calendar/store', [CalendarController::class, 'store'])->name('calendar.store'); // 予定登録
+    Route::get('/calendar/{id}', [CalendarController::class, 'show'])->name('calendar.show'); // 予定詳細
+    Route::get('/calendar/{id}/edit', [CalendarController::class, 'edit'])->name('calendar.edit'); // 予定編集フォーム
+    Route::put('/calendar/{id}', [CalendarController::class, 'update'])->name('calendar.update'); // 予定更新
+    Route::delete('/calendar/{id}', [CalendarController::class, 'destroy'])->name('calendar.destroy'); // 予定削除
 });

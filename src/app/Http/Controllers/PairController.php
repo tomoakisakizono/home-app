@@ -78,7 +78,7 @@ class PairController extends Controller
         $pairName = $user1->name . ' & ' . $user->name;
 
         // 🔹 デフォルト画像のパスを設定
-        $defaultImagePath = 'images/default-pair.png';
+        $defaultImagePath = 'images/default_pair.png';
 
         // **ペアを確定**
         $pair->update([
@@ -87,6 +87,10 @@ class PairController extends Controller
             'pair_image' => $defaultImagePath, // 🔹 ここにデフォルト画像を設定！
             'status' => 'accepted'
         ]);
+
+        // ✅ `users` テーブルの `pair_id` を更新（両者に設定）
+        User::where('id', $pair->user1_id)->update(['pair_id' => $pair->id]); // 招待したユーザー
+        User::where('id', $pair->user2_id)->update(['pair_id' => $pair->id]); // 承認したユーザー
 
         return redirect()->route('pair.show')->with('success', 'ペアが成立しました！');
     }
