@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->text('content');
+            $table->foreignId('pair_id')->constrained()->cascadeOnDelete();
+            $table->text('content'); // 投稿内容
+            $table->timestamp('scheduled_at')->nullable(); // カレンダー連携用
             $table->timestamps();
         });
     }
