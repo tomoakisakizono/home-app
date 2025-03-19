@@ -11,6 +11,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ShoppingListController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PhotoController;
 
 // ユーザ登録
 Route::get('/register', [RegisterController::class, 'showForm'])->name('register.form');
@@ -60,4 +61,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 
+    Route::get('/photos', [PhotoController::class, 'index'])->name('photos.index'); // 一覧表示
+    Route::post('/photos', [PhotoController::class, 'store'])->name('photos.store'); // 投稿処理
+    Route::post('/photos/multiple-upload', [PhotoController::class, 'multipleUpload'])->name('photos.multipleUpload');
+    Route::get('/photos/{photo}', [PhotoController::class, 'show'])->name('photos.show'); // 詳細表示
+    Route::get('/photos/{photo}/edit', [PhotoController::class, 'edit'])->name('photos.edit'); // 編集ページ
+    Route::put('/photos/{photo}', [PhotoController::class, 'update'])->name('photos.update'); // 更新処理
+    Route::get('/photos/download/{photoImage}', [PhotoController::class, 'download'])->name('photos.download');
+    Route::get('/photos/download-all/{photo}', [PhotoController::class, 'downloadAll'])->name('photos.downloadAll');
+    Route::delete('/photos/{photo}/images/{photoImage}', [PhotoController::class, 'deleteImage'])->name('photos.deleteImage');
+    Route::delete('/photos/{photo}', [PhotoController::class, 'destroy'])->name('photos.destroy'); // 削除
 });

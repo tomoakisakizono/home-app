@@ -126,7 +126,7 @@
         </a>
     </div>
     <div class="col-md-2">
-        <a href="#" class="text-decoration-none">
+        <a href="{{ route('photos.index') }}" class="text-decoration-none">
             <div class="card p-3 text-center">
                 <h5>写真</h5>
                 <i class="fa-regular fa-images fa-2x"></i>

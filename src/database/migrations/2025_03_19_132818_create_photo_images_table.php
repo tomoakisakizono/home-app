@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('photos', function (Blueprint $table) {
+        Schema::create('photo_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pair_id')->constrained('pairs')->onDelete('cascade'); // ペアIDで管理
+            $table->foreignId('photo_id')->constrained()->onDelete('cascade'); // 親の投稿と紐づく
             $table->string('image_path'); // 画像ファイルのパス
-            $table->text('comment')->nullable(); // コメント
-            $table->date('photo_date'); // 写真の日付
-            $table->string('category'); // カテゴリ（例：子育て、ご飯）
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('photos');
+        Schema::dropIfExists('photo_images');
     }
 };
