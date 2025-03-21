@@ -27,7 +27,7 @@ class PhotoController extends Controller
             $query->where('category', $request->category);
         }
 
-        $photos = $query->orderBy('photo_date', 'desc')->paginate(10);
+        $photos = $query->orderBy('created_at', 'desc')->paginate(9);
 
         return view('photos.index', compact('photos'));
     }
@@ -43,10 +43,12 @@ class PhotoController extends Controller
         ]);
 
         $pairId = Auth::user()->pair_id;
+        $userId = Auth::id();
 
         // 1つの投稿（Photo）を作成
         $photo = Photo::create([
             'pair_id' => $pairId,
+            'user_id' => $userId,
             'photo_date' => $request->photo_date,
             'comment' => $request->comment,
             'category' => $request->category,
@@ -238,7 +240,7 @@ class PhotoController extends Controller
 
         return redirect()->route('photos.edit', $photo)->with('success', '画像を削除しました。');
     }
-    
+
     public function destroy(Photo $photo)
     {
         if ($photo->pair_id !== Auth::user()->pair_id) {

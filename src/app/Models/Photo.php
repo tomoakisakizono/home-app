@@ -10,7 +10,7 @@ class Photo extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['pair_id', 'image_path', 'comment', 'photo_date', 'category'];
+    protected $fillable = ['pair_id', 'user_id', 'image_path', 'comment', 'photo_date', 'category'];
 
     public function pair()
     {
@@ -25,6 +25,11 @@ class Photo extends Model
     public function images()
     {
         return $this->hasMany(PhotoImage::class);
+    }
+
+        public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
 

@@ -120,15 +120,21 @@
         @foreach ($photos as $photo)
             <div class="col-md-4 mb-3">
                 <div class="card h-100 d-flex flex-column">
-                    @if ($photo->images->count() > 0)
-                        <img src="{{ asset('storage/' . $photo->images->first()->image_path) }}" class="card-img-top">
-                    @else
-                        <img src="{{ asset('storage/default-placeholder.jpg') }}" class="card-img-top">
-                    @endif
-
+                    <div class="card-img-container">
+                        @if ($photo->images->count() > 0)
+                            <img src="{{ asset('storage/' . $photo->images->first()->image_path) }}" 
+                                class="card-img-top img-fluid"
+                                style="height: 200px; object-fit: cover; width: 100%;">
+                        @else
+                            <img src="{{ asset('storage/default-placeholder.jpg') }}" 
+                                class="card-img-top img-fluid"
+                                style="height: 200px; object-fit: cover; width: 100%;">
+                        @endif
+                    </div>
                     <div class="card-body d-flex flex-column">
                         <p class="flex-grow-1">{{ $photo->comment }}</p>
-                        <p><small>日付: {{ $photo->photo_date }}</small></p>
+                        <p><small>投稿者: {{ $photo->user->name }}</small></p>
+                        <p><small>投稿日: {{ $photo->created_at }}</small></p>
                         <p><small>カテゴリ: {{ $photo->category }}</small></p>
                         <a href="{{ route('photos.show', $photo) }}" class="btn btn-info">詳細</a>
                     </div>

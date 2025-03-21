@@ -28,7 +28,7 @@
                                     onsubmit="return confirm('この画像を削除しますか？');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger">削除</button>
+                                    <button type="submit" class="btn btn-danger btn-sm">削除</button>
                                 </form>
                             </div>
                         </div>
