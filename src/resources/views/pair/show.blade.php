@@ -134,7 +134,7 @@
         </a>
     </div>
     <div class="col-md-2">
-        <a href="#" class="text-decoration-none">
+        <a href="{{ route('videos.index') }}" class="text-decoration-none">
             <div class="card p-3 text-center">
                 <h5>動画</h5>
                 <i class="fa-regular fa-pen-to-square fa-2x"></i>

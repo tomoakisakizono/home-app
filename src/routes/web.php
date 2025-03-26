@@ -12,6 +12,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ShoppingListController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\VideoController;
 
 // ユーザ登録
 Route::get('/register', [RegisterController::class, 'showForm'])->name('register.form');
@@ -71,4 +72,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/photos/download-all/{photo}', [PhotoController::class, 'downloadAll'])->name('photos.downloadAll');
     Route::delete('/photos/{photo}/images/{photoImage}', [PhotoController::class, 'deleteImage'])->name('photos.deleteImage');
     Route::delete('/photos/{photo}', [PhotoController::class, 'destroy'])->name('photos.destroy'); // 削除
+
+    Route::resource('videos', VideoController::class);
 });

@@ -48,7 +48,7 @@
     </div>
 </div>
 
-<h4 class="text-center mb-3">ペア編集</h4>
+<h4 class="text-center mb-3 mt-2">ペア編集</h4>
 
 <!-- ペアネーム編集フォーム -->
 <form action="{{ route('pair.update_name') }}" method="POST">

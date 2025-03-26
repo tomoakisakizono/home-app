@@ -104,15 +104,18 @@
     {{-- 検索フォーム --}}
     <form method="GET" class="mb-3">
         <input type="text" name="keyword" placeholder="コメント検索" class="form-control" value="{{ request('keyword') }}">
-        <select name="category" class="form-control mt-2">
-            <option value="">すべてのカテゴリ</option>
-            <option value="家族" {{ request('category') == '家族' ? 'selected' : '' }}>家族</option>
-            <option value="子ども" {{ request('category') == '子ども' ? 'selected' : '' }}>子ども</option>
-            <option value="メニュー" {{ request('category') == 'メニュー' ? 'selected' : '' }}>メニュー</option>
-            <option value="お出かけ" {{ request('category') == 'お出かけ' ? 'selected' : '' }}>お出かけ</option>
-            <option value="その他" {{ request('category') == 'その他' ? 'selected' : '' }}>その他</option>
-        </select>
-        <button type="submit" class="btn btn-primary mt-2">検索</button>
+        <div class="d-flex align-items-center gap-2 mt-1">
+            <label for="category" class="form-label mb-0">カテゴリ：</label>
+            <select name="category" id="category" class="form-select w-auto d-inline-block me-2">
+                <option value="">すべて</option>
+                <option value="家族" {{ request('category') == '家族' ? 'selected' : '' }}>家族</option>
+                <option value="子ども" {{ request('category') == '子ども' ? 'selected' : '' }}>子ども</option>
+                <option value="メニュー" {{ request('category') == 'メニュー' ? 'selected' : '' }}>メニュー</option>
+                <option value="お出かけ" {{ request('category') == 'お出かけ' ? 'selected' : '' }}>お出かけ</option>
+                <option value="その他" {{ request('category') == 'その他' ? 'selected' : '' }}>その他</option>
+            </select>
+            <button type="submit" class="btn btn-primary h-100">検索</button>
+        </div>
     </form>
 
     {{-- 写真一覧表示 --}}

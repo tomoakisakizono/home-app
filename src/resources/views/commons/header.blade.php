@@ -8,7 +8,7 @@
             <ul class="navbar-nav ms-auto">
                 @if(Auth::check())
                 <li class="nav-item"><a class="nav-link text-white" href="{{ route('pair.show') }}">{{ Auth::user()->name }}</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="{{ route('pair.edit') }}">ペアページ</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="{{ route('pair.edit') }}">ペア編集</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="{{ route('logout') }}">ログアウト</a></li>
                 @else
                 <li class="nav-item"><a class="nav-link text-white" href="{{ route('register.form') }}">新規ユーザ登録</a></li>
