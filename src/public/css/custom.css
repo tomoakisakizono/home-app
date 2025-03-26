@@ -24,3 +24,14 @@
 .d-flex {
     gap: 4px; /* ボタン間の隙間を調整 */
 }
+
+.auto-font-size {
+    font-size: clamp(0.75rem, 2.5vw, 1rem);
+    white-space: nowrap;
+}
+
+.menu-label {
+    font-size: 0.85rem;     /* 少し小さく */
+    max-width: 100%;
+    overflow: hidden;
+}

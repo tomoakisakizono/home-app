@@ -13,6 +13,7 @@ use App\Http\Controllers\ShoppingListController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\TaskController;
 
 // ユーザ登録
 Route::get('/register', [RegisterController::class, 'showForm'])->name('register.form');
@@ -74,4 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/photos/{photo}', [PhotoController::class, 'destroy'])->name('photos.destroy'); // 削除
 
     Route::resource('videos', VideoController::class);
+
+    Route::resource('tasks', TaskController::class);
+    Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
 });

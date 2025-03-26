@@ -50,11 +50,11 @@
 
 <form action="{{ route('pair.functions.store') }}" method="POST" class="mt-3">
     @csrf
-    <div class="d-flex align-items-center">
-        <!-- 🔹 プルダウンボタン -->
-        <div class="me-2">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <!-- 機能選択ボタン -->
+        <div class="flex-shrink-0">
             <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" id="functionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn btn-success dropdown-toggle" type="button" id="functionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                     機能を選択
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="functionDropdown">
@@ -69,14 +69,15 @@
             <input type="hidden" name="function_name" id="selectedFunction" value="">
         </div>
 
-        <!-- 🔹 詳細入力エリア -->
-        <div class="me-2" style="width: 800px;">
-            <textarea class="form-control" name="details" rows="1" placeholder="詳細を入力" required></textarea>
+        <!-- 詳細入力欄 -->
+        <div class="flex-grow-1">
+            <textarea class="form-control w-100" name="details" rows="1" placeholder="詳細を入力" required></textarea>
         </div>
-        <!-- 🔹 送信ボタン -->
-        <div class="ms-2">
-            <button type="submit" class="btn btn-primary">登録</button>
-        </div>
+    </div>
+
+    <!-- 登録ボタン：常に下に表示 -->
+    <div class="text-start mt-2">
+        <button type="submit" class="btn btn-primary px-4 w-100">登録</button>
     </div>
 </form>
 
@@ -100,51 +101,51 @@
 </table>
 
 <h3 class="text-center mt-5">メインメニュー</h3>
-<div class="row text-center mt-2 mb-4">
-    <div class="col-md-2">
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-6 g-3 text-center mt-2 mb-4">
+    <div class="col">
         <a href="{{ route('messages.index') }}" class="text-decoration-none">
-            <div class="card p-3 text-center">
-                <h5 class="mb-2">メッセージ</h5>
+            <div class="card p-3">
+                <h6 class="menu-label text-nowrap text-truncate">メッセージ</h6>
                 <i class="fa-regular fa-envelope fa-2x"></i>
             </div>
         </a>
     </div>
-    <div class="col-md-2">
+    <div class="col">
         <a href="{{ route('calendar.index') }}" class="text-decoration-none">
-            <div class="card p-3 text-center">
-                <h5 class="mb-2">カレンダー</h5>
+            <div class="card p-3">
+                <h6 class="menu-label text-nowrap text-truncate">カレンダー</h6>
                 <i class="fa-regular fa-calendar fa-2x"></i>
             </div>
         </a>
     </div>
-    <div class="col-md-2">
+    <div class="col">
         <a href="{{ route('shopping.index') }}" class="text-decoration-none">
-            <div class="card p-3 text-center">
-                <h5 class="mb-2">買い物</h5>
+            <div class="card p-3">
+                <h6 class="menu-label text-nowrap text-truncate">買い物</h6>
                 <i class="fa-regular fa-file fa-2x"></i>
             </div>
         </a>
     </div>
-    <div class="col-md-2">
+    <div class="col">
         <a href="{{ route('photos.index') }}" class="text-decoration-none">
-            <div class="card p-3 text-center">
-                <h5>写真</h5>
+            <div class="card p-3">
+                <h6 class="menu-label text-nowrap text-truncate">写真</h6>
                 <i class="fa-regular fa-images fa-2x"></i>
             </div>
         </a>
     </div>
-    <div class="col-md-2">
+    <div class="col">
         <a href="{{ route('videos.index') }}" class="text-decoration-none">
-            <div class="card p-3 text-center">
-                <h5>動画</h5>
+            <div class="card p-3">
+                <h6 class="menu-label text-nowrap text-truncate">動画</h6>
                 <i class="fa-regular fa-pen-to-square fa-2x"></i>
             </div>
         </a>
     </div>
-    <div class="col-md-2">
-        <a href="#" class="text-decoration-none">
-            <div class="card p-3 text-center">
-                <h5>作業リスト</h5>
+    <div class="col">
+        <a href="{{ route('tasks.index') }}" class="text-decoration-none">
+            <div class="card p-3">
+                <h6 class="menu-label text-nowrap text-truncate">作業リスト</h6>
                 <i class="fa-regular fa-rectangle-list fa-2x"></i>
             </div>
         </a>
