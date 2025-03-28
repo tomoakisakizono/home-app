@@ -83,9 +83,9 @@
                             </div>
                         @endif
 
-                        <p>{{ $video->comment }}</p>
+                        <p>{!! $video->comment !== null ? e($video->comment) : '&nbsp;' !!}</p>
                         <p><small>登録日: {{ $video->registered_at }}</small></p>
-                        <p><small>カテゴリ: {{ $video->category }}</small></p>
+                        <p><small>カテゴリ: {{ $video->category ?? '' }}</small></p>
 
                         {{-- 編集・削除ボタン --}}
                         @if (Auth::id() === $video->user_id)
@@ -106,6 +106,6 @@
 </div>
 {{ $videos->withQueryString()->links() }}
 <div class="d-flex justify-content-center">
-    <a href="{{ route('pair.show') }}" class="btn btn-secondary mb-1">ペアページへ</a>
+    <a href="{{ route('pair.show') }}" class="btn btn-secondary mb-3">ペアページへ</a>
 </div>
 @endsection

@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Video;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use App\Models\Video;
+use App\Notifications\VideoPosted;
 
 class VideoController extends Controller
 {
@@ -50,15 +51,30 @@ class VideoController extends Controller
             'registered_at' => 'required|date',
         ]);
 
-        // 保存
-        Video::create([
-            'pair_id' => Auth::user()->pair_id,
-            'user_id' => Auth::id(),
+        $user = Auth::user();
+        $pairId = $user->pair_id;
+    
+        if (!$pairId) {
+            return redirect()->route('pair.setup')->with('error', 'ペアを設定してください。');
+        }
+        
+        $video = Video::create([
+            'pair_id' => $pairId,
+            'user_id' => $user->id,
             'youtube_url' => $request->youtube_url,
             'comment' => $request->comment,
             'category' => $request->category,
             'registered_at' => $request->registered_at,
         ]);
+
+        $partner = \App\Models\User::where('pair_id', $pairId)
+                ->where('id', '!=', $user->id)
+                ->first();
+
+        if ($partner) {
+            $video->user = $user; // 通知用に user をセット
+            $partner->notify(new VideoPosted($video));
+        }
 
         return redirect()->route('videos.index')->with('success', '動画を投稿しました！');
     }

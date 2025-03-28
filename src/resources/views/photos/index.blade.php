@@ -149,7 +149,7 @@
     {{ $photos->links() }}
 </div>
 <div class="d-flex justify-content-center">
-    <a href="{{ route('pair.show') }}" class="btn btn-secondary mb-1">ペアページへ</a>
+    <a href="{{ route('pair.show') }}" class="btn btn-secondary mb-3">ペアページへ</a>
 </div>
 
 @endsection

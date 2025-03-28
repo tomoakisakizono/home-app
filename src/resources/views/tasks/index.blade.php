@@ -74,8 +74,8 @@
                             <form action="{{ route('tasks.toggle', $task) }}" method="POST">
                                 @csrf
                                 @method('PATCH')
-                                <button type="submit" class="btn btn-sm {{ $task->is_done ? 'btn-secondary' : 'btn-success' }}">
-                                    {{ $task->is_done ? '未完了' : '完了' }}
+                                <button type="submit" class="btn btn-sm {{ $task->is_done ? 'btn-success' : 'btn-secondary' }}">
+                                    {{ $task->is_done ? '完了' : '未完了' }}
                                 </button>
                             </form>
 
@@ -97,6 +97,6 @@
     @endif
 </div>
 <div class="d-flex justify-content-center">
-    <a href="{{ route('pair.show') }}" class="btn btn-secondary mb-1">ペアページへ</a>
+    <a href="{{ route('pair.show') }}" class="btn btn-secondary mb-3">ペアページへ</a>
 </div>
 @endsection

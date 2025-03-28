@@ -2,6 +2,35 @@
 
 @section('content')
 
+@auth
+@if(auth()->user()->unreadNotifications->count())
+    <div class="dropdown text-end mb-2" style="position: relative;">
+        <a class="text-dark position-relative" href="#" role="button" id="notificationDropdown"
+            data-bs-toggle="dropdown" aria-expanded="false" onclick="markNotificationsAsRead()">
+            🔔
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ auth()->user()->unreadNotifications->count() }}
+            </span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end"
+            aria-labelledby="notificationDropdown"
+            style="min-width: 280px; max-width: 90vw; word-break: break-word;">
+            @forelse(auth()->user()->unreadNotifications as $notification)
+                <li class="dropdown-item small">
+                    <a href="{{ $notification->data['link'] }}" class="text-decoration-none d-block">
+                        {{ $notification->data['message'] }}
+                        <br>
+                        <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+                    </a>
+                </li>
+            @empty
+                <li class="dropdown-item">通知はありません</li>
+            @endforelse
+        </ul>
+    </div>
+@endif
+@endauth
+
 @if(session('success'))
     <div class="alert alert-success text-center">
         {{ session('success') }}
@@ -10,7 +39,7 @@
 
 <div class="row">
     <div class="text-center mb-3 col-md-3">
-        <img src="{{ $pair->getImageUrl() }}" class="img-fluid rounded-circle" style="width: 250px; height: 250px; object-fit: cover;" alt="ペア画像">
+        <img src="{{ asset('storage/' . $pair->pair_image) }}" class="img-fluid rounded-circle" style="width: 250px; height: 250px; object-fit: cover;" alt="ペア画像">
     </div>
 
     <div class="col-md-9 mt-4">
@@ -48,7 +77,7 @@
     </div>
 </div>
 
-<form action="{{ route('pair.functions.store') }}" method="POST" class="mt-3">
+<form action="{{ route('functions.store') }}" method="POST" class="mt-3">
     @csrf
     <div class="d-flex flex-wrap align-items-center gap-2">
         <!-- 機能選択ボタン -->
@@ -90,12 +119,12 @@
         </tr>
     </thead>
     <tbody>
-        @foreach($latestFunctions as $function)
-        <tr>
-            <td>{{ $function->function_name }}</td>
-            <td>{{ $function->created_at->format('Y-m-d H:i') }}</td> <!-- 🔹 日付カラム -->
-            <td class="text-start">{{ $function->details }}</td>
-        </tr>
+        @foreach ($latestFunctions as $function)
+            <tr>
+                <td>{{ $function->function_name }}</td>
+                <td class="text-nowrap">{{ $function->created_at->format('n/j H:i') }}</td>
+                <td>{{ $function->details }}</td>
+            </tr>
         @endforeach
     </tbody>
 </table>
@@ -166,6 +195,16 @@
             });
         });
     });
+
+    function markNotificationsAsRead() {
+        fetch("{{ route('notifications.read') }}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    document.getElementById('notification-badge')?.remove();
+                }
+            });
+    }
 </script>
 
 @endsection

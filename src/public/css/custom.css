@@ -35,3 +35,14 @@
     max-width: 100%;
     overflow: hidden;
 }
+
+#notificationDropdown + .dropdown-menu {
+    left: auto !important;
+    right: 0 !important;
+    top: 100% !important;
+}
+
+.card {
+    border-radius: 15px;
+    border: 1px solid #eee;
+}

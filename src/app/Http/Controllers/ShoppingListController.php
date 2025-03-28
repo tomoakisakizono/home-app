@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Notifications\ShoppingItemAdded;
 use App\Models\ShoppingList;
+use App\Models\User;
 use App\Models\Pair;
 use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
@@ -56,7 +58,7 @@ class ShoppingListController extends Controller
         $user = Auth::user();
         $pair = Pair::where('user1_id', $user->id)->orWhere('user2_id', $user->id)->where('status', 'accepted')->first();
 
-        ShoppingList::create([
+        $item = ShoppingList::create([
             'pair_id' => $pair->id,
             'user_id' => $user->id,
             'item_name' => $request->item_name,
@@ -64,6 +66,14 @@ class ShoppingListController extends Controller
             'status' => '未購入',
             'category_id' => $request->category_id,
         ]);
+
+        $partner = $pair->user1_id === $user->id
+        ? User::find($pair->user2_id)
+        : User::find($pair->user1_id);
+
+        if ($partner) {
+            $partner->notify(new ShoppingItemAdded($item));
+        }
 
         return redirect()->route('shopping.index')->with('success', '買い物リストに追加しました！');
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Photo;
 use App\Models\PhotoImage;
+use App\Notifications\PhotoPosted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -42,13 +43,17 @@ class PhotoController extends Controller
             'category' => 'required|string',
         ]);
 
-        $pairId = Auth::user()->pair_id;
-        $userId = Auth::id();
+        $user = Auth::user();
+        $pairId = $user->pair_id;
+
+        if (!$pairId) {
+            return redirect()->back()->with('error', 'ペアが設定されていません。');
+        }
 
         // 1つの投稿（Photo）を作成
         $photo = Photo::create([
             'pair_id' => $pairId,
-            'user_id' => $userId,
+            'user_id' => $user->id,
             'photo_date' => $request->photo_date,
             'comment' => $request->comment,
             'category' => $request->category,
@@ -63,6 +68,15 @@ class PhotoController extends Controller
                 'photo_id' => $photo->id,
                 'image_path' => $path,
             ]);
+        }
+
+        $partner = \App\Models\User::where('pair_id', $pairId)
+                ->where('id', '!=', $user->id)
+                ->first();
+
+        if ($partner) {
+            $photo->user = $user; // 通知用に user をセット
+            $partner->notify(new PhotoPosted($photo));
         }
 
         return redirect()->route('photos.index')->with('success', '写真を投稿しました！');

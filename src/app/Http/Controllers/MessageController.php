@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Message;
 use App\Models\Pair;
 use App\Models\Calendar;
+use App\Notifications\MessagePosted;
 
 class MessageController extends Controller
 {
@@ -58,12 +59,17 @@ class MessageController extends Controller
         }
 
         // 🔹 メッセージ登録
-        Message::create([
+        $message = Message::create([
             'user_id' => $user->id,
             'pair_id' => $pair->id,
             'calendar_id' => $calendar ? $calendar->id : null, // カレンダーと連携
             'content' => $request->content,
         ]);
+
+        $partner = $pair->user1_id === $user->id ? $pair->user2 : $pair->user1;
+        if ($partner) {
+            $partner->notify(new MessagePosted($message));
+        }
 
         return redirect()->route('messages.index')->with('success', 'メッセージを投稿しました！');
     }

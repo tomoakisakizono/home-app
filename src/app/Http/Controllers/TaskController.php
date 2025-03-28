@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Task;
+use App\Notifications\TaskCreated;
 use Carbon\Carbon;
 
 class TaskController extends Controller
@@ -12,30 +13,6 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // public function index()
-    // {
-    //     $pairId = Auth::user()->pair_id;
-
-    //     $tasks = Task::where('pair_id', Auth::user()->pair_id)
-    //         ->orderBy('is_done') // 未完了が上にくる
-    //         ->orderBy('due_date') // さらに期限が近い順に
-    //         ->get()
-    //         ->groupBy(function ($task) {
-    //             return \Carbon\Carbon::parse($task->due_date)->format('Y年m月');
-    //         });
-
-    //     // 各タスクに「期限間近」フラグを追加
-    //         foreach ($tasks as $group) {
-    //             foreach ($group as $task) {
-    //                 $dueDate = \Carbon\Carbon::parse($task->due_date)->startOfDay();
-    //                 $today = \Carbon\Carbon::today();
-    //                 $daysLeft = $dueDate->diffInDays($today, false);
-    //                 $task->is_due_soon = (!$task->is_done && $daysLeft >= 0 && $daysLeft <= 3);
-    //             }
-    //         }
-
-    //     return view('tasks.index', compact('tasks'));
-    // }
     public function index(Request $request)
     {
         $pairId = Auth::user()->pair_id;
@@ -81,12 +58,28 @@ class TaskController extends Controller
             'due_date' => 'required|date',
         ]);
 
-        Task::create([
-            'pair_id' => Auth::user()->pair_id,
+        $user = Auth::user();
+        $pairId = $user->pair_id;
+    
+        if (!$pairId) {
+            return redirect()->back()->with('error', 'ペアを設定してください。');
+        }    
+
+        $task = Task::create([
+            'pair_id' => $pairId,
             'title' => $request->title,
             'due_date' => $request->due_date,
             'is_done' => false,
         ]);
+
+        $partner = \App\Models\User::where('pair_id', $pairId)
+                ->where('id', '!=', $user->id)
+                ->first();
+
+        if ($partner) {
+            $task->user = $user; // 通知クラス用に user をセット
+            $partner->notify(new TaskCreated($task));
+        }
 
         return redirect()->route('tasks.index')->with('success', '作業を登録しました！');
     }

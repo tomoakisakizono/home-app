@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Calendar;
-use App\Models\Pair; // 🔹 追加（ペア情報取得に必要）
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon; // 🔹 追加（日付操作に必要）
+use App\Models\Pair;
+use App\Notifications\CalendarEventCreated;
+use Carbon\Carbon;
 
 class CalendarController extends Controller
 {
@@ -19,19 +20,15 @@ class CalendarController extends Controller
             return redirect()->route('pair.setup')->with('error', 'ペアを設定してください。');
         }
 
-        $events = Calendar::where('pair_id', $pairId)->orderBy('event_date', 'asc')->get();
-        
+        $events = Calendar::where('pair_id', $pairId)
+            ->orderBy('event_date', 'asc')
+            ->get();
+
         return view('calendar.index', compact('events'));
     }
 
     public function store(Request $request)
     {
-        $user = Auth::user();
-
-        if (!$user->pair_id) {
-            return redirect()->route('pair.setup')->with('error', 'ペアを設定してください。');
-        }
-
         $request->validate([
             'title' => 'required|string|max:255',
             'event_date' => 'required|date',
@@ -39,8 +36,15 @@ class CalendarController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        Calendar::create([
-            'pair_id' => $user->pair_id,
+        $user = Auth::user();
+        $pairId = $user->pair_id;
+
+        if (!$user->pair_id) {
+            return redirect()->route('pair.setup')->with('error', 'ペアを設定してください。');
+        }
+
+        $calendar = Calendar::create([
+            'pair_id' => $pairId,
             'user_id' => $user->id,
             'title' => $request->title,
             'event_date' => $request->event_date,
@@ -48,7 +52,28 @@ class CalendarController extends Controller
             'description' => $request->description,
         ]);
 
+        $partner = \App\Models\User::where('pair_id', $pairId)
+                ->where('id', '!=', $user->id)
+                ->first();
+
+        if ($partner) {
+            $calendar->user = $user; // 通知クラスに渡すためにuserプロパティ追加
+            $partner->notify(new CalendarEventCreated($calendar));
+        }
+
         return redirect()->route('calendar.index')->with('success', '予定を追加しました！');
+    }
+
+    public function edit($id)
+    {
+        $event = Calendar::findOrFail($id);
+
+        // 認可：ログインユーザーのペアIDが一致するかチェック
+        if ($event->pair_id !== Auth::user()->pair_id) {
+            abort(403, '許可されていません');
+        }
+
+        return view('calendar.edit', compact('event'));
     }
 
     public function update(Request $request, $id)
@@ -56,10 +81,16 @@ class CalendarController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'event_date' => 'required|date',
-            'event_time' => 'nullable',
+            'event_time' => 'nullable|date_format:H:i',
+            'description' => 'nullable|string|max:1000',
         ]);
 
         $event = Calendar::findOrFail($id);
+
+        if ($event->pair_id !== Auth::user()->pair_id) {
+            abort(403, '許可されていません');
+        }
+
         $event->update($request->all());
 
         return redirect()->route('calendar.index')->with('success', '予定を更新しました！');

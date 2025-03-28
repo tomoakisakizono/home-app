@@ -9,8 +9,13 @@ class FunctionRecord extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['pair_id', 'user_id', 'function_name', 'details']; // 🔹 pair_id を追加！
-
+    protected $fillable = [
+        'pair_id',
+        'user_id',
+        'function_name',
+        'details',
+    ];
+    
     public function pair()
     {
         return $this->belongsTo(Pair::class);
