@@ -26,6 +26,11 @@ Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 // 認証後のルーティング
 Route::middleware(['auth'])->group(function () {
+    // ユーザー関連
+    Route::get('/users/edit', [UsersController::class, 'edit'])->name('users.edit');
+    Route::put('/users/update', [UsersController::class, 'update'])->name('users.update');
+    Route::post('/users/update-image', [UsersController::class, 'updateImage'])->name('users.updateImage');
+
     // ペア関連
     Route::prefix('pair')->name('pair.')->group(function () {
         Route::get('/', [PairController::class, 'show'])->name('show');

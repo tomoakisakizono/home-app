@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_image',
     ];
 
     /**
@@ -60,19 +61,8 @@ class User extends Authenticatable
 
     public function pair()
     {
-        return $this->hasOne(Pair::class, function ($query) {
-            $query->where('status', 'accepted');
-        })->where(function ($query) {
-            $query->where('user1_id', $this->id)
-                ->orWhere('user2_id', $this->id);
-        });
+        return $this->belongsTo(Pair::class);
     }
-    // public function pair()
-    // {
-    //     return $this->hasOne(Pair::class, 'user1_id')
-    //             ->orWhere('user2_id', $this->id)
-    //             ->where('status', 'accepted');
-    // }
 
     public function pairUser()
     {

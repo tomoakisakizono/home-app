@@ -37,43 +37,55 @@
     </div>
 @endif
 
-<div class="row">
-    <div class="text-center mb-3 col-md-3">
-        <img src="{{ asset('storage/' . $pair->pair_image) }}" class="img-fluid rounded-circle" style="width: 250px; height: 250px; object-fit: cover;" alt="ペア画像">
-    </div>
-
-    <div class="col-md-9 mt-4">
-        <div class="d-flex justify-content-between">
-            <!-- 自分の情報 -->
-            <div class="card p-3 text-left">
-                <h5 class="pair-info">ユーザーネーム:<br> {{ $user->name }}</h5>
-                <h5 class="pair-info">アドレス:<br> {{ $user->email }}</h5>
-                <h5 class="pair-info">
-                    ペアネーム:<br>
-                    @if (!empty($partner))
-                        {{ $pair->pair_name }}
-                    @else
-                        ペア未設定
-                    @endif
-                </h5>
-            </div>
-
-            <div class="align-self-center">
-                <h2>⇆</h2>
-            </div>
-
-            <!-- ペアの相手の情報 -->
+<h3 class="text-center mt-3">メインメニュー</h3>
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-6 g-3 text-center mt-2 mb-5">
+    <div class="col">
+        <a href="{{ route('messages.index') }}" class="text-decoration-none">
             <div class="card p-3">
-                @if (!empty($partner))
-                <h5 class="pair-info">ユーザーネーム:<br> {{ $partner->name }}</h5>
-                <h5 class="pair-info">アドレス:<br> {{ $partner->email }}</h5>
-                <h5 class="pair-info">ペアネーム:<br>{{ $pair->pair_name }}</h5>
-                @else
-                    <h5>ペアが未設定です</h5>
-                    <p>招待コードを入力してください。</p>
-                @endif
+                <h6 class="menu-label text-nowrap text-truncate">メッセージ</h6>
+                <i class="fa-regular fa-envelope fa-2x"></i>
             </div>
-        </div>
+        </a>
+    </div>
+    <div class="col">
+        <a href="{{ route('calendar.index') }}" class="text-decoration-none">
+            <div class="card p-3">
+                <h6 class="menu-label text-nowrap text-truncate">カレンダー</h6>
+                <i class="fa-regular fa-calendar fa-2x"></i>
+            </div>
+        </a>
+    </div>
+    <div class="col">
+        <a href="{{ route('shopping.index') }}" class="text-decoration-none">
+            <div class="card p-3">
+                <h6 class="menu-label text-nowrap text-truncate">買い物</h6>
+                <i class="fa-regular fa-file fa-2x"></i>
+            </div>
+        </a>
+    </div>
+    <div class="col">
+        <a href="{{ route('photos.index') }}" class="text-decoration-none">
+            <div class="card p-3">
+                <h6 class="menu-label text-nowrap text-truncate">写真</h6>
+                <i class="fa-regular fa-images fa-2x"></i>
+            </div>
+        </a>
+    </div>
+    <div class="col">
+        <a href="{{ route('videos.index') }}" class="text-decoration-none">
+            <div class="card p-3">
+                <h6 class="menu-label text-nowrap text-truncate">動画</h6>
+                <i class="fa-regular fa-pen-to-square fa-2x"></i>
+            </div>
+        </a>
+    </div>
+    <div class="col">
+        <a href="{{ route('tasks.index') }}" class="text-decoration-none">
+            <div class="card p-3">
+                <h6 class="menu-label text-nowrap text-truncate">作業リスト</h6>
+                <i class="fa-regular fa-rectangle-list fa-2x"></i>
+            </div>
+        </a>
     </div>
 </div>
 
@@ -129,57 +141,48 @@
     </tbody>
 </table>
 
-<h3 class="text-center mt-5">メインメニュー</h3>
-<div class="row row-cols-2 row-cols-sm-3 row-cols-md-6 g-3 text-center mt-2 mb-4">
-    <div class="col">
-        <a href="{{ route('messages.index') }}" class="text-decoration-none">
-            <div class="card p-3">
-                <h6 class="menu-label text-nowrap text-truncate">メッセージ</h6>
-                <i class="fa-regular fa-envelope fa-2x"></i>
-            </div>
-        </a>
+<div class="row justify-content-center align-items-center mt-5 mb-3">
+    <div class="text-center mb-3 col-md-3">
+        <img src="{{ $pair->getImageUrl() }}" class="img-fluid rounded-circle" style="width: 250px; height: 250px; object-fit: cover;" alt="ペア画像">
     </div>
-    <div class="col">
-        <a href="{{ route('calendar.index') }}" class="text-decoration-none">
-            <div class="card p-3">
-                <h6 class="menu-label text-nowrap text-truncate">カレンダー</h6>
-                <i class="fa-regular fa-calendar fa-2x"></i>
-            </div>
-        </a>
+    <!-- 自分 -->
+    <div class="col-md-4 text-center">
+        <div class="profile-card p-4 border rounded-3 bg-white shadow-sm">
+            <img src="{{ asset('storage/' . $user->profile_image) }}"
+                class="mb-3 border border-2"
+                style="width: 120px; height: 120px; object-fit: cover;">
+            <h5 class="fw-bold mb-1">{{ $user->name }}</h5>
+            <div class="text-muted small">{{ $user->email }}</div>
+        </div>
     </div>
-    <div class="col">
-        <a href="{{ route('shopping.index') }}" class="text-decoration-none">
-            <div class="card p-3">
-                <h6 class="menu-label text-nowrap text-truncate">買い物</h6>
-                <i class="fa-regular fa-file fa-2x"></i>
-            </div>
-        </a>
+
+    <!-- 中央のペアアイコン -->
+    <div class="col-md-1 d-flex flex-column align-items-center justify-content-center">
+        <div class="fw-light small text-muted mt-1">⇆Pair⇆</div>
     </div>
-    <div class="col">
-        <a href="{{ route('photos.index') }}" class="text-decoration-none">
-            <div class="card p-3">
-                <h6 class="menu-label text-nowrap text-truncate">写真</h6>
-                <i class="fa-regular fa-images fa-2x"></i>
-            </div>
-        </a>
-    </div>
-    <div class="col">
-        <a href="{{ route('videos.index') }}" class="text-decoration-none">
-            <div class="card p-3">
-                <h6 class="menu-label text-nowrap text-truncate">動画</h6>
-                <i class="fa-regular fa-pen-to-square fa-2x"></i>
-            </div>
-        </a>
-    </div>
-    <div class="col">
-        <a href="{{ route('tasks.index') }}" class="text-decoration-none">
-            <div class="card p-3">
-                <h6 class="menu-label text-nowrap text-truncate">作業リスト</h6>
-                <i class="fa-regular fa-rectangle-list fa-2x"></i>
-            </div>
-        </a>
+
+    <!-- 相手 -->
+    <div class="col-md-4 text-center">
+        <div class="profile-card p-4 border rounded-3 bg-white shadow-sm">
+            @if (!empty($partner))
+                <img src="{{ asset('storage/' . $partner->profile_image) }}"
+                    class="mb-3 border border-2"
+                    style="width: 120px; height: 120px; object-fit: cover;">
+                <h5 class="fw-bold mb-1">{{ $partner->name }}</h5>
+                <div class="text-muted small">{{ $partner->email }}</div>
+            @else
+                <p class="text-danger mt-4">ペア未設定</p>
+            @endif
+        </div>
     </div>
 </div>
+
+<!-- ペアネーム表示 -->
+@if (!empty($partner))
+    <div class="text-center mb-4">
+        <span class="badge bg-dark px-4 py-2 fs-6">ペアネーム：{{ $pair->pair_name }}</span>
+    </div>
+@endif
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
