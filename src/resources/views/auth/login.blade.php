@@ -5,24 +5,8 @@
 @section('content')
 <div class="container mt-5">
     <h2 class="text-center">ログイン</h2>
-
-    @if(session('success'))
-        <div class="alert alert-success text-center">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @include('commons.error_messages')
-    <!-- @if($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif -->
-
+    @include('partials.alerts')
+    
     <form action="{{ route('login.store') }}" method="POST">
         @csrf
         <div class="mb-3">

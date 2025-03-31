@@ -1,13 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="container mb-4">
     <h2>動画一覧・投稿</h2>
-
-    {{-- 投稿成功メッセージ --}}
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+    @include('partials.alerts')
 
     {{-- 投稿フォーム --}}
     <div class="card mb-4">

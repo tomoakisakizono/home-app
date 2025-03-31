@@ -6,10 +6,7 @@
     <!-- 🔹 カテゴリー管理ページへのリンクボタン -->
     <a href="{{ route('categories.index') }}" class="btn btn-outline-primary">カテゴリー管理</a>
 </div>
-
-@if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-@endif
+@include('partials.alerts')
 
 <!-- 🔹 買い物リスト追加フォーム -->
 <form action="{{ route('shopping.store') }}" method="POST" class="d-flex flex-wrap align-items-center">

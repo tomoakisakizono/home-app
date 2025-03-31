@@ -31,13 +31,9 @@
 @endif
 @endauth
 
-@if(session('success'))
-    <div class="alert alert-success text-center">
-        {{ session('success') }}
-    </div>
-@endif
-
 <h3 class="text-center mt-3">メインメニュー</h3>
+@include('partials.alerts')
+
 <div class="row row-cols-2 row-cols-sm-3 row-cols-md-6 g-3 text-center mt-2 mb-5">
     <div class="col">
         <a href="{{ route('messages.index') }}" class="text-decoration-none">

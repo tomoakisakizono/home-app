@@ -5,12 +5,7 @@
 @section('content')
 <div class="container mt-5">
     <h2 class="text-center">ユーザー登録</h2>
-
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+    @include('partials.alerts')
 
     <form action="{{ route('register.store') }}" method="POST">
         @csrf

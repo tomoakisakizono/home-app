@@ -5,14 +5,9 @@
 @section('content')
 <div class="container mt-4">
     <h2 class="text-center">プロフィール編集</h2>
+    @include('partials.alerts')
 
-    @if(session('success'))
-        <div class="alert alert-success text-center">
-            {{ session('success') }}
-        </div>
-    @endif
     <div class="row justify-content-center align-items-center my-3">
-
         <!-- 自分 -->
         <div class="col-md-4 text-center">
             <div class="profile-card p-4 border rounded-3 bg-white shadow-sm">

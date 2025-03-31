@@ -3,17 +3,7 @@
 @section('content')
 <div class="container mb-4">
     <h2>作業を追加</h2>
-
-    {{-- バリデーションエラー --}}
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    @include('partials.alerts')
 
     <form action="{{ route('tasks.store') }}" method="POST">
         @csrf

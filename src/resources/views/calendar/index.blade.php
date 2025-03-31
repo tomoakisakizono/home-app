@@ -4,6 +4,7 @@
 <div class="container mb-4">
     <!-- カレンダー表示 -->
     <div id="calendar" style="min-height: 600px;" class="mb-4"></div>
+    @include('partials.alerts')
 
     <!-- 予定追加フォーム -->
     <div class="card p-3 mb-4">

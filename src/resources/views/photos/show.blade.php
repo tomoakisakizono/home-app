@@ -3,6 +3,8 @@
 @section('content')
 <div class="container mb-4">
     <h2>写真の詳細</h2>
+    @include('partials.alerts')
+
     {{-- スライドショー（投稿の画像を切り替え） --}}
     @if($photo->images->count() > 0)
         <div id="photoCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -28,7 +30,6 @@
     @endif
 
     <div class="card mt-3">
-        <!-- <img src="{{ asset('storage/' . $photo->image_path) }}" class="card-img-top" style="max-height: 500px; object-fit: contain;"> -->
         <div class="card-body">
             <p><strong>コメント:</strong> {{ $photo->comment }}</p>
             <p><strong>撮影日:</strong> {{ $photo->photo_date }}</p>

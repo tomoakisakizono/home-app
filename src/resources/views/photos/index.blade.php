@@ -1,23 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="container mb-4">
     <h2>写真一覧</h2>
+    @include('partials.alerts')
 
     {{-- 写真投稿フォーム --}}
     <div class="card mb-4">
         <div class="card-body">
-
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <form action="{{ route('photos.multipleUpload') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3">

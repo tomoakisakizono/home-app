@@ -3,10 +3,7 @@
 @section('content')
 <div class="container mb-4">
     <h2 class="text-center my-3">メッセージ</h2>
-
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+    @include('partials.alerts')
 
     <!-- 🔹 投稿フォーム -->
     <div class="card p-3 mb-3">

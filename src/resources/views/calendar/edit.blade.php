@@ -3,6 +3,7 @@
 @section('content')
 <div class="container mb-4">
     <h2 class="my-4"><i class="fa-regular fa-pen-to-square"></i> 予定を編集</h2>
+    @include('partials.alerts')
 
     <div class="card p-3">
         <form action="{{ route('calendar.update', $event->id) }}" method="POST">

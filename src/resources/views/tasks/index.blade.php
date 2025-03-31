@@ -1,13 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="container mb-4">
     <h2>作業リスト</h2>
-
-    {{-- 成功メッセージ --}}
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+    @include('partials.alerts')
 
     {{-- 作業追加フォーム --}}
     <div class="card mb-4">

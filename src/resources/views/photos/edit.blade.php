@@ -3,16 +3,7 @@
 @section('content')
 <div class="container mb-4">
     <h2>写真の編集</h2>
-
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    @include('partials.alerts')
 
     {{-- 現在の画像一覧と削除ボタン --}}
     @if ($photo->images->count() > 0)

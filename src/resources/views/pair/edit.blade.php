@@ -2,12 +2,6 @@
 
 @section('content')
 
-@if(session('success'))
-    <div class="alert alert-success text-center">
-        {{ session('success') }}
-    </div>
-@endif
-
 <div class="row justify-content-center align-items-center my-3">
     <div class="text-center mb-3 col-md-3">
         <img src="{{ $pair->getImageUrl() }}" class="img-fluid rounded-circle" style="width: 250px; height: 250px; object-fit: cover;" alt="ペア画像">
@@ -51,6 +45,7 @@
 @endif
 
 <h4 class="text-center mb-3 mt-2">ペア編集</h4>
+@include('partials.alerts')
 
 <!-- ペアネーム編集フォーム -->
 <form action="{{ route('pair.update_name') }}" method="POST">
