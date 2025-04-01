@@ -17,12 +17,12 @@
 
             <div class="mb-3">
                 <label for="event_date" class="form-label">日付</label>
-                <input type="date" name="event_date" id="event_date" class="form-control" value="{{ old('event_date', $event->event_date) }}" required>
+                <input type="date" name="event_date" id="event_date" class="form-control" value="{{ old('event_date', optional($event->event_date)->format('Y-m-d')) }}" required>
             </div>
 
             <div class="mb-3">
                 <label for="event_time" class="form-label">時間</label>
-                <input type="time" name="event_time" id="event_time" class="form-control" value="{{ old('event_time', $event->event_time) }}">
+                <input type="time" name="event_time" id="event_time" class="form-control" value="{{ old('event_time', optional($event->event_time)->format('H:i')) }}">
             </div>
 
             <div class="mb-3">

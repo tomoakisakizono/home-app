@@ -82,39 +82,6 @@ class PhotoController extends Controller
         return redirect()->route('photos.index')->with('success', '写真を投稿しました！');
     }
 
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'images' => 'required|array|max:10', // 画像は10枚まで
-    //         'images.*' => 'image|max:2048', // 各画像のサイズ上限を2MB
-    //         'photo_date' => 'required|date',
-    //         'comment' => 'nullable|string|max:255',
-    //         'category' => 'required|string',
-    //     ]);
-
-    //     $pairId = Auth::user()->pair_id;
-
-    //     // 投稿データを作成
-    //     $photo = Photo::create([
-    //         'pair_id' => $pairId,
-    //         'photo_date' => $request->photo_date,
-    //         'comment' => $request->comment,
-    //         'category' => $request->category,
-    //     ]);
-
-    //     // 画像を保存
-    //     foreach ($request->file('images') as $image) {
-    //         $path = $image->store('photos', 'public');
-
-    //         PhotoImage::create([
-    //             'photo_id' => $photo->id,
-    //             'image_path' => $path,
-    //         ]);
-    //     }
-
-    //     return redirect()->route('photos.index')->with('success', '写真をアップロードしました！');
-    // }
-
     public function show(Photo $photo)
     {
         // 他のペアの写真にアクセス不可

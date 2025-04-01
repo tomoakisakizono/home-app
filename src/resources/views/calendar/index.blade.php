@@ -57,7 +57,7 @@
         const filtered = events.filter(e => {
             const date = new Date(e.event_date);
             return date.getFullYear() === currentMonth.getFullYear() &&
-                   date.getMonth() === currentMonth.getMonth();
+                date.getMonth() === currentMonth.getMonth();
         });
 
         if (filtered.length === 0) {

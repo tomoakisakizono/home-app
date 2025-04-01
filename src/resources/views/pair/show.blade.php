@@ -17,7 +17,7 @@
             style="min-width: 280px; max-width: 90vw; word-break: break-word;">
             @forelse(auth()->user()->unreadNotifications as $notification)
                 <li class="dropdown-item small">
-                    <a href="{{ $notification->data['link'] }}" class="text-decoration-none d-block">
+                    <a href="{{ $notification->data['link'] }}" class="text-decoration-none text-wrap d-block">
                         {{ $notification->data['message'] }}
                         <br>
                         <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>

@@ -15,29 +15,30 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        $pairId = Auth::user()->pair_id;
+        $user = Auth::user();
+        $pairId = $user->pair_id;
+        $today = now();
 
-        // 表示対象の月（例: 2025-03）を取得（なければ現在月）
-        $selectedMonth = $request->query('month', now()->format('Y-m'));
-
-        // 表示対象月の開始・終了日を決定
-        $startOfMonth = Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
-        $endOfMonth = $startOfMonth->copy()->endOfMonth();
-
-        // 該当月のタスクを取得（ペアごと・期限順）
         $tasks = Task::where('pair_id', $pairId)
-            ->whereBetween('due_date', [$startOfMonth, $endOfMonth])
-            ->orderBy('due_date', 'asc')
+            ->where(function ($query) use ($today) {
+                $query->whereDate('due_date', '>=', $today)
+                    ->orWhere(function ($q) use ($today) {
+                        $q->whereDate('due_date', '<', $today)
+                            ->where('is_done', false);
+                    });
+            })
+            ->orderBy('due_date')
             ->get()
             ->map(function ($task) {
-                $task->is_due_soon = !$task->is_done && Carbon::parse($task->due_date)->isBetween(now(), now()->addDays(3));
+                $task->is_due_soon = !$task->is_done && \Carbon\Carbon::parse($task->due_date)->isBetween(now(), now()->addDays(3));
                 return $task;
+            })
+            // 月ごとにグループ化（例: '2025年04月' => [tasks...])
+            ->groupBy(function ($task) {
+                return \Carbon\Carbon::parse($task->due_date)->format('Y年m月');
             });
 
-        return view('tasks.index', [
-            'tasks' => $tasks,
-            'selectedMonth' => $selectedMonth,
-        ]);
+        return view('tasks.index', compact('tasks'));
     }
 
     /**

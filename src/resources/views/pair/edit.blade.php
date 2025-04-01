@@ -63,5 +63,6 @@
         <input type="file" class="form-control" name="pair_image" id="pair_image" required>
     </div>
     <button type="submit" class="btn btn-primary mb-4">画像を更新</button>
+    <a href="{{ route('pair.show') }}" class="btn btn-secondary mb-4">戻る</a>
 </form>
 @endsection
