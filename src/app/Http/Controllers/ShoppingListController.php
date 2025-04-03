@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Notifications\ShoppingItemAdded;
 use App\Models\ShoppingList;
+use App\Models\User;
 use App\Models\Pair;
 use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ShoppingListController extends Controller
 {
@@ -52,22 +55,40 @@ class ShoppingListController extends Controller
             'quantity' => 'required|integer|min:1',
             'category_id' => 'nullable|exists:categories,id',
         ]);
-
+    
         $user = Auth::user();
-        $pair = Pair::where('user1_id', $user->id)->orWhere('user2_id', $user->id)->where('status', 'accepted')->first();
-
-        ShoppingList::create([
-            'pair_id' => $pair->id,
-            'user_id' => $user->id,
-            'item_name' => $request->item_name,
-            'quantity' => $request->quantity,
-            'status' => '未購入',
-            'category_id' => $request->category_id,
-        ]);
-
-        return redirect()->route('shopping.index')->with('success', '買い物リストに追加しました！');
+        $pair = Pair::where('user1_id', $user->id)
+                    ->orWhere('user2_id', $user->id)
+                    ->where('status', 'accepted')
+                    ->first();
+    
+        DB::beginTransaction();
+        try {
+            $item = ShoppingList::create([
+                'pair_id' => $pair->id,
+                'user_id' => $user->id,
+                'item_name' => $request->item_name,
+                'quantity' => $request->quantity,
+                'status' => '未購入',
+                'category_id' => $request->category_id,
+            ]);
+    
+            $partner = $pair->user1_id === $user->id
+                ? User::find($pair->user2_id)
+                : User::find($pair->user1_id);
+    
+            if ($partner) {
+                $partner->notify(new ShoppingItemAdded($item));
+            }
+    
+            DB::commit();
+            return redirect()->route('shopping.index')->with('success', '買い物リストに追加しました！');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', '登録中にエラーが発生しました。')->withInput();
+        }
     }
-
+    
     public function updateStatus($id)
     {
         $item = ShoppingList::findOrFail($id);

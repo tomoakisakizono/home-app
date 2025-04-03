@@ -6,16 +6,13 @@
     <!-- 🔹 カテゴリー管理ページへのリンクボタン -->
     <a href="{{ route('categories.index') }}" class="btn btn-outline-primary">カテゴリー管理</a>
 </div>
-
-@if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-@endif
+@include('partials.alerts')
 
 <!-- 🔹 買い物リスト追加フォーム -->
 <form action="{{ route('shopping.store') }}" method="POST" class="d-flex flex-wrap align-items-center">
     @csrf
     <input type="text" name="item_name" class="form-control me-2 mb-2" placeholder="アイテム名" required>
-    <input type="number" name="quantity" class="form-control me-2 mb-2" min="1" value="1" required>
+    <input type="number" name="quantity" class="form-control me-2 mb-2" min="1" placeholder="個数" required>
 
     <!-- 🔹 カテゴリー選択 -->
     <select name="category_id" class="form-select me-2 mb-2">
@@ -58,6 +55,10 @@
         @endforeach
     </ul>
 @endforeach
+
+<div class="d-flex justify-content-center">
+    <a href="{{ route('pair.show') }}" class="btn btn-secondary mb-3">ペアページへ</a>
+</div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {

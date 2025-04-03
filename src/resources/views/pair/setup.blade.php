@@ -4,12 +4,8 @@
     <h2>ペア設定</h2>
 
     <!-- 成功メッセージ（招待コードを含む） -->
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
-
+    @include('partials.alerts')
+    
     <!-- 既存の招待コードがある場合 -->
     @if(isset($pair) && $pair->invite_code)
         <h3>発行済みの招待コード</h3>

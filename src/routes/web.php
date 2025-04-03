@@ -11,6 +11,9 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ShoppingListController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\VideoController;
+use App\Http\Controllers\TaskController;
 
 // ユーザ登録
 Route::get('/register', [RegisterController::class, 'showForm'])->name('register.form');
@@ -19,45 +22,71 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 // ログイン
 Route::get('/login', [LoginController::class, 'showForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.store');
-Route::get('/logout', [LogoutController::class, 'logout'])->name('logout');
+Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
-// トップページ表示
-// Route::prefix('users/{id}')->group(function () {
-//     Route::get('/', [UsersController::class, 'index'])->name('users.show');
-// });
-
+// 認証後のルーティング
 Route::middleware(['auth'])->group(function () {
-    Route::get('/pair', [PairController::class, 'show'])->name('pair.show');
-    Route::get('/pair/setup', [PairController::class, 'setup'])->name('pair.setup');
-    Route::post('/pair/invite', [PairController::class, 'invite'])->name('pair.invite');
-    Route::post('/pair/accept', [PairController::class, 'accept'])->name('pair.accept');
-    Route::get('/pair/edit', [PairController::class, 'edit'])->name('pair.edit');
-    Route::post('/pair/update_image', [PairController::class, 'updateImage'])->name('pair.update_image');
-    Route::post('/pair/update_name', [PairController::class, 'updateName'])->name('pair.update_name');
-    Route::get('/pair/functions', [FunctionController::class, 'index'])->name('pair.functions');
-    Route::post('/pair/functions/store', [FunctionController::class, 'store'])->name('pair.functions.store');
-    Route::post('/pair/decline/{pair_id}', [PairController::class, 'decline'])->name('pair.decline');
+    // ユーザー関連
+    Route::get('/users/edit', [UsersController::class, 'edit'])->name('users.edit');
+    Route::put('/users/update', [UsersController::class, 'update'])->name('users.update');
+    Route::post('/users/update-image', [UsersController::class, 'updateImage'])->name('users.updateImage');
 
-    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index'); // メッセージ一覧
-    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store'); // メッセージ投稿
-    Route::get('/messages/{id}/edit', [MessageController::class, 'edit'])->name('messages.edit'); // 編集ページ
-    Route::put('/messages/{id}', [MessageController::class, 'update'])->name('messages.update'); // メッセージ更新
-    Route::delete('/messages/{id}', [MessageController::class, 'destroy'])->name('messages.destroy'); // メッセージ削除
+    // ペア関連
+    Route::prefix('pair')->name('pair.')->group(function () {
+        Route::get('/', [PairController::class, 'show'])->name('show');
+        Route::get('/setup', [PairController::class, 'setup'])->name('setup');
+        Route::post('/invite', [PairController::class, 'invite'])->name('invite');
+        Route::post('/accept', [PairController::class, 'accept'])->name('accept');
+        Route::get('/edit', [PairController::class, 'edit'])->name('edit');
+        Route::post('/update_image', [PairController::class, 'updateImage'])->name('update_image');
+        Route::post('/update_name', [PairController::class, 'updateName'])->name('update_name');
+        Route::post('/decline/{pair_id}', [PairController::class, 'decline'])->name('decline');
+    });
 
-    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index'); // カレンダー表示
-    Route::post('/calendar/store', [CalendarController::class, 'store'])->name('calendar.store'); // 予定登録
-    Route::get('/calendar/{id}', [CalendarController::class, 'show'])->name('calendar.show'); // 予定詳細
-    Route::get('/calendar/{id}/edit', [CalendarController::class, 'edit'])->name('calendar.edit'); // 予定編集フォーム
-    Route::put('/calendar/{id}', [CalendarController::class, 'update'])->name('calendar.update'); // 予定更新
-    Route::delete('/calendar/{id}', [CalendarController::class, 'destroy'])->name('calendar.destroy'); // 予定削除
+    // 機能記録
+    Route::get('/functions', [FunctionController::class, 'index'])->name('functions.index');
+    Route::post('/functions', [FunctionController::class, 'store'])->name('functions.store');
 
-    Route::get('/shopping', [ShoppingListController::class, 'index'])->name('shopping.index');
-    Route::post('/shopping', [ShoppingListController::class, 'store'])->name('shopping.store');
-    Route::post('/shopping/{id}/status', [ShoppingListController::class, 'updateStatus'])->name('shopping.updateStatus');
-    Route::delete('/shopping/{id}', [ShoppingListController::class, 'destroy'])->name('shopping.destroy');
+    // メッセージ
+    Route::resource('messages', MessageController::class)->except(['create', 'show']);
 
-    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
-    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
-    Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    // カレンダー
+    Route::resource('calendar', CalendarController::class);
 
+    // 買い物リスト
+    Route::prefix('shopping')->name('shopping.')->group(function () {
+        Route::get('/', [ShoppingListController::class, 'index'])->name('index');
+        Route::post('/', [ShoppingListController::class, 'store'])->name('store');
+        Route::post('/{id}/status', [ShoppingListController::class, 'updateStatus'])->name('updateStatus');
+        Route::delete('/{id}', [ShoppingListController::class, 'destroy'])->name('destroy');
+    });
+
+    // カテゴリ
+    Route::resource('categories', CategoryController::class)->only(['index', 'store', 'destroy']);
+
+    // 写真
+    Route::prefix('photos')->name('photos.')->group(function () {
+        Route::get('/', [PhotoController::class, 'index'])->name('index');
+        Route::post('/', [PhotoController::class, 'store'])->name('store');
+        Route::post('/multiple-upload', [PhotoController::class, 'multipleUpload'])->name('multipleUpload');
+        Route::get('/{photo}', [PhotoController::class, 'show'])->name('show');
+        Route::get('/{photo}/edit', [PhotoController::class, 'edit'])->name('edit');
+        Route::put('/{photo}', [PhotoController::class, 'update'])->name('update');
+        Route::get('/download/{photoImage}', [PhotoController::class, 'download'])->name('download');
+        Route::get('/download-all/{photo}', [PhotoController::class, 'downloadAll'])->name('downloadAll');
+        Route::delete('/{photo}/images/{photoImage}', [PhotoController::class, 'deleteImage'])->name('deleteImage');
+        Route::delete('/{photo}', [PhotoController::class, 'destroy'])->name('destroy');
+    });
+
+    // 動画
+    Route::resource('videos', VideoController::class);
+
+    // 作業リスト
+    Route::resource('tasks', TaskController::class);
+    Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
+
+    Route::get('/notifications/read', function () {
+        auth()->user()->unreadNotifications->markAsRead();
+        return response()->json(['status' => 'ok']);
+    })->name('notifications.read');
 });

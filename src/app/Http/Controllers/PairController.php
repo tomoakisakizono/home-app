@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Pair;
 use App\Models\User;
 use App\Models\FunctionRecord;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class PairController extends Controller
 {
@@ -59,56 +61,40 @@ class PairController extends Controller
         ]);
     
         $user = Auth::user();
-        
-        // **招待コードに対応するペアを取得（user2_id が NULL のペアのみ）**
+    
         $pair = Pair::where('invite_code', $request->invite_code)
                     ->whereNull('user2_id')
                     ->first();
-
-        if (!$pair) {
-            return redirect()->back()->with('error', '無効な招待コードです、または既に使用されています。');
+    
+        if (!$pair || $pair->user1_id === $user->id) {
+            return redirect()->back()->with('error', '無効な招待コードです。');
         }
     
-        // **自分が user1_id でないことを確認**
-        if ($pair->user1_id === $user->id) {
-            return redirect()->back()->with('error', '自分の招待コードは使用できません。');
+        DB::beginTransaction();
+        try {
+            $user1 = User::find($pair->user1_id);
+            $pairName = $user1->name . ' & ' . $user->name;
+    
+            $defaultImagePath = 'images/default_pair.png';
+    
+            $pair->update([
+                'user2_id' => $user->id,
+                'pair_name' => $pairName,
+                'pair_image' => $defaultImagePath,
+                'status' => 'accepted'
+            ]);
+    
+            User::where('id', $pair->user1_id)->update(['pair_id' => $pair->id]);
+            User::where('id', $pair->user2_id)->update(['pair_id' => $pair->id]);
+    
+            DB::commit();
+            return redirect()->route('pair.show')->with('success', 'ペアが成立しました！');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'ペアの承認処理中にエラーが発生しました。');
         }
-        // 🔹 ペアネームを作成
-        $user1 = User::find($pair->user1_id);
-        $pairName = $user1->name . ' & ' . $user->name;
-
-        // 🔹 デフォルト画像のパスを設定
-        $defaultImagePath = 'images/default_pair.png';
-
-        // **ペアを確定**
-        $pair->update([
-            'user2_id' => $user->id,
-            'pair_name' => $pairName, // 🔹 ペアネームを保存
-            'pair_image' => $defaultImagePath, // 🔹 ここにデフォルト画像を設定！
-            'status' => 'accepted'
-        ]);
-
-        // ✅ `users` テーブルの `pair_id` を更新（両者に設定）
-        User::where('id', $pair->user1_id)->update(['pair_id' => $pair->id]); // 招待したユーザー
-        User::where('id', $pair->user2_id)->update(['pair_id' => $pair->id]); // 承認したユーザー
-
-        return redirect()->route('pair.show')->with('success', 'ペアが成立しました！');
     }
     
-    // // ペア拒否
-    // public function decline($pair_id)
-    // {
-    //     $pair = Pair::findOrFail($pair_id);
-
-    //     if ($pair->user2_id !== Auth::id()) {
-    //         return response()->json(['message' => '拒否できません'], 403);
-    //     }
-
-    //     $pair->delete();
-
-    //     return response()->json(['message' => 'ペア招待を拒否しました']);
-    // }
-
     // 自分のペア情報を取得
     public function show()
     {
@@ -136,7 +122,7 @@ class PairController extends Controller
         }
 
         // 🔹 直近の登録内容を取得（最新3件）
-        $latestFunctions = FunctionRecord::where('pair_id', $pair->id)
+        $latestFunctions = FunctionRecord::where('user_id', $user->id)
                             ->latest()
                             ->take(3)
                             ->get();
@@ -172,35 +158,36 @@ class PairController extends Controller
     public function updateImage(Request $request)
     {
         $request->validate([
-            'pair_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // 2MBまでの画像のみ許可
+            'pair_image' => 'image|mimes:jpg,jpeg,png,webp,heic|max:4096',
         ]);
-
+    
         $user = Auth::user();
         $pair = Pair::where('user1_id', $user->id)
                     ->orWhere('user2_id', $user->id)
                     ->where('status', 'accepted')
                     ->first();
-
+    
         if (!$pair) {
             return redirect()->back()->with('error', 'ペアが設定されていません。');
         }
-
-        // **画像をストレージに保存**
+    
+        // 🔽 画像アップロード処理
         if ($request->hasFile('pair_image')) {
-            $path = $request->file('pair_image')->store('pair_images', 'public'); // 🔹 `storage/app/public/pair_images/` に保存
-
-            // **既存の画像を削除（あれば）**
+            // 新しい画像を保存
+            $path = $request->file('pair_image')->store('pair_images', 'public');
+    
+            // 古い画像がある場合は削除
             if ($pair->pair_image) {
                 Storage::disk('public')->delete($pair->pair_image);
             }
-
-            // **新しい画像を保存**
+    
+            // DB更新
             $pair->update(['pair_image' => $path]);
         }
-
-        return redirect()->route('pair.show')->with('success', 'ペア画像を更新しました！');
+    
+        return redirect()->route('pair.edit')->with('success', 'ペア画像を更新しました！');
     }
-
+    
     public function updateName(Request $request)
     {
         $request->validate([
@@ -222,7 +209,7 @@ class PairController extends Controller
         // 🔹 ペアネームを更新
         $pair->update(['pair_name' => $request->pair_name]);
 
-        return redirect()->route('pair.show')->with('success', 'ペアネームを更新しました！');
+        return redirect()->route('pair.edit')->with('success', 'ペアネームを更新しました！');
     }
 
 }

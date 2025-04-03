@@ -8,3 +8,46 @@
 .text-left {
     text-align: left !important;
 }
+
+.category-btn {
+    flex: 1; /* ボタンの幅を均等にする */
+    min-width: 18%; /* 5つのボタンが1行に収まるよう調整 */
+    max-width: 20%;
+    font-size: 12px; /* 文字を小さくする */
+    padding: 6px 4px; /* ボタンの内側余白を調整 */
+    text-align: center;
+    white-space: nowrap; /* 文字の改行を防ぐ */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.d-flex {
+    gap: 4px; /* ボタン間の隙間を調整 */
+}
+
+.auto-font-size {
+    font-size: clamp(0.75rem, 2.5vw, 1rem);
+    white-space: nowrap;
+}
+
+.menu-label {
+    font-size: 0.85rem;     /* 少し小さく */
+    max-width: 100%;
+    overflow: hidden;
+}
+
+#notificationDropdown + .dropdown-menu {
+    left: auto !important;
+    right: 0 !important;
+    top: 100% !important;
+}
+
+.card {
+    border-radius: 15px;
+    border: 1px solid #eee;
+}
+
+.rounded-circle {
+    border: 2px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
