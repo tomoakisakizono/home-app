@@ -6,11 +6,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_image',
     ];
 
     /**
@@ -45,4 +48,26 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function pairAsUser1()
+    {
+        return $this->hasOne(Pair::class, 'user1_id');
+    }
+
+    public function pairAsUser2()
+    {
+        return $this->hasOne(Pair::class, 'user2_id');
+    }
+
+    public function pair()
+    {
+        return $this->belongsTo(Pair::class);
+    }
+
+    public function pairUser()
+    {
+        return $this->belongsTo(User::class, 'id', 'user1_id')
+                ->orWhere('id', '<>', $this->id);
+    }
+
 }
