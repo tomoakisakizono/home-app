@@ -30,8 +30,8 @@ class FunctionController extends Controller
             ->latest()
             ->take(3)
             ->get();
-    dd($latestFunctions);
-        return view('pair.show', compact('pair', 'latestFunctions'));
+
+            return view('pair.show', compact('pair', 'latestFunctions'));
     }
 
     public function store(Request $request)

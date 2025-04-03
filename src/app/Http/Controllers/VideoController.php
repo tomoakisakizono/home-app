@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Video;
 use App\Notifications\VideoPosted;
+use Illuminate\Support\Facades\DB;
 
 class VideoController extends Controller
 {
@@ -43,42 +44,48 @@ class VideoController extends Controller
      */
     public function store(Request $request)
     {
-        // バリデーション
         $request->validate([
             'youtube_url' => 'required|url',
             'comment' => 'nullable|string|max:255',
             'category' => 'required|string',
             'registered_at' => 'required|date',
         ]);
-
+    
         $user = Auth::user();
         $pairId = $user->pair_id;
     
         if (!$pairId) {
             return redirect()->route('pair.setup')->with('error', 'ペアを設定してください。');
         }
-        
-        $video = Video::create([
-            'pair_id' => $pairId,
-            'user_id' => $user->id,
-            'youtube_url' => $request->youtube_url,
-            'comment' => $request->comment,
-            'category' => $request->category,
-            'registered_at' => $request->registered_at,
-        ]);
-
-        $partner = \App\Models\User::where('pair_id', $pairId)
-                ->where('id', '!=', $user->id)
-                ->first();
-
-        if ($partner) {
-            $video->user = $user; // 通知用に user をセット
-            $partner->notify(new VideoPosted($video));
+    
+        DB::beginTransaction();
+        try {
+            $video = Video::create([
+                'pair_id' => $pairId,
+                'user_id' => $user->id,
+                'youtube_url' => $request->youtube_url,
+                'comment' => $request->comment,
+                'category' => $request->category,
+                'registered_at' => $request->registered_at,
+            ]);
+    
+            $partner = \App\Models\User::where('pair_id', $pairId)
+                        ->where('id', '!=', $user->id)
+                        ->first();
+    
+            if ($partner) {
+                $video->user = $user;
+                $partner->notify(new VideoPosted($video));
+            }
+    
+            DB::commit();
+            return redirect()->route('videos.index')->with('success', '動画を投稿しました！');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', '動画投稿に失敗しました。')->withInput();
         }
-
-        return redirect()->route('videos.index')->with('success', '動画を投稿しました！');
     }
-
+    
     /**
      * Display the specified resource.
      */

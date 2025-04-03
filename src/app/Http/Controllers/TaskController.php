@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Task;
 use App\Notifications\TaskCreated;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class TaskController extends Controller
 {
@@ -58,33 +59,40 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'due_date' => 'required|date',
         ]);
-
+    
         $user = Auth::user();
         $pairId = $user->pair_id;
     
         if (!$pairId) {
             return redirect()->back()->with('error', 'ペアを設定してください。');
-        }    
-
-        $task = Task::create([
-            'pair_id' => $pairId,
-            'title' => $request->title,
-            'due_date' => $request->due_date,
-            'is_done' => false,
-        ]);
-
-        $partner = \App\Models\User::where('pair_id', $pairId)
-                ->where('id', '!=', $user->id)
-                ->first();
-
-        if ($partner) {
-            $task->user = $user; // 通知クラス用に user をセット
-            $partner->notify(new TaskCreated($task));
         }
-
-        return redirect()->route('tasks.index')->with('success', '作業を登録しました！');
+    
+        DB::beginTransaction();
+        try {
+            $task = Task::create([
+                'pair_id' => $pairId,
+                'title' => $request->title,
+                'due_date' => $request->due_date,
+                'is_done' => false,
+            ]);
+    
+            $partner = \App\Models\User::where('pair_id', $pairId)
+                    ->where('id', '!=', $user->id)
+                    ->first();
+    
+            if ($partner) {
+                $task->user = $user;
+                $partner->notify(new TaskCreated($task));
+            }
+    
+            DB::commit();
+            return redirect()->route('tasks.index')->with('success', '作業を登録しました！');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', '作業の登録中にエラーが発生しました。')->withInput();
+        }
     }
-
+    
     /**
      * Display the specified resource.
      */

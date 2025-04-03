@@ -5,7 +5,6 @@
 @section('content')
 <div class="container mt-4">
     <h2 class="text-center">プロフィール編集</h2>
-    @include('partials.alerts')
 
     <div class="row justify-content-center align-items-center my-3">
         <!-- 自分 -->
@@ -19,8 +18,9 @@
             </div>
         </div>
     </div>
+    @include('partials.alerts')
 
-    {{-- プロフィール画像 --}}
+    <!-- {{-- プロフィール画像 --}} -->
     <form action="{{ route('users.updateImage') }}" method="POST" enctype="multipart/form-data" class="mb-4">
         @csrf
         <div class="mb-3">
@@ -30,7 +30,7 @@
         <button type="submit" class="btn btn-primary">画像を更新</button>
     </form>
 
-    {{-- ユーザー情報編集 --}}
+    <!-- {{-- ユーザー情報編集 --}} -->
     <form action="{{ route('users.update') }}" method="POST">
         @csrf
         @method('PUT')

@@ -27,7 +27,7 @@
                     <select class="form-control" id="category" name="category" required>
                         <option value="">選択してください</option>
                         <option value="子ども">子ども</option>
-                        <option value="外食用">外食用</option>
+                        <option value="おすすめ">おすすめ</option>
                         <option value="お気に入り">お気に入り</option>
                     </select>
                 </div>
@@ -49,7 +49,7 @@
             <select name="category" id="category" class="form-select w-auto d-inline-block me-2">
                 <option value="">すべて</option>
                 <option value="子ども" {{ request('category') == '子ども' ? 'selected' : '' }}>子ども</option>
-                <option value="外食用" {{ request('category') == '外食用' ? 'selected' : '' }}>外食用</option>
+                <option value="おすすめ" {{ request('category') == 'おすすめ' ? 'selected' : '' }}>おすすめ</option>
                 <option value="お気に入り" {{ request('category') == 'お気に入り' ? 'selected' : '' }}>お気に入り</option>
             </select>
             <button type="submit" class="btn btn-primary h-100">検索</button>

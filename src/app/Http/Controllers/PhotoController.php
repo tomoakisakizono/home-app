@@ -8,6 +8,7 @@ use App\Notifications\PhotoPosted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use ZipArchive;
 
 class PhotoController extends Controller
@@ -36,50 +37,55 @@ class PhotoController extends Controller
     public function multipleUpload(Request $request)
     {
         $request->validate([
-            'images' => 'required|array|max:10', // 画像は最大10枚
-            'images.*' => 'image|max:2048', // 各画像のサイズ上限2MB
+            'images' => 'required|array|max:10',
+            'images.*' => 'image|max:2048',
             'photo_date' => 'required|date',
             'comment' => 'nullable|string|max:255',
             'category' => 'required|string',
         ]);
-
+    
         $user = Auth::user();
         $pairId = $user->pair_id;
-
+    
         if (!$pairId) {
             return redirect()->back()->with('error', 'ペアが設定されていません。');
         }
-
-        // 1つの投稿（Photo）を作成
-        $photo = Photo::create([
-            'pair_id' => $pairId,
-            'user_id' => $user->id,
-            'photo_date' => $request->photo_date,
-            'comment' => $request->comment,
-            'category' => $request->category,
-        ]);
-
-        // 投稿に紐づく画像を保存
-        foreach ($request->file('images') as $image) {
-            $path = $image->store('photos', 'public');
-
-            // `photo_images` テーブルに画像を保存
-            PhotoImage::create([
-                'photo_id' => $photo->id,
-                'image_path' => $path,
+    
+        DB::beginTransaction();
+        try {
+            $photo = Photo::create([
+                'pair_id' => $pairId,
+                'user_id' => $user->id,
+                'photo_date' => $request->photo_date,
+                'comment' => $request->comment,
+                'category' => $request->category,
             ]);
+    
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('photos', 'public');
+    
+                PhotoImage::create([
+                    'photo_id' => $photo->id,
+                    'image_path' => $path,
+                ]);
+            }
+    
+            $partner = \App\Models\User::where('pair_id', $pairId)
+                    ->where('id', '!=', $user->id)
+                    ->first();
+    
+            if ($partner) {
+                $photo->user = $user;
+                $partner->notify(new PhotoPosted($photo));
+            }
+    
+            DB::commit();
+            return redirect()->route('photos.index')->with('success', '写真を投稿しました！');
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', '投稿中にエラーが発生しました。')->withInput();
         }
-
-        $partner = \App\Models\User::where('pair_id', $pairId)
-                ->where('id', '!=', $user->id)
-                ->first();
-
-        if ($partner) {
-            $photo->user = $user; // 通知用に user をセット
-            $partner->notify(new PhotoPosted($photo));
-        }
-
-        return redirect()->route('photos.index')->with('success', '写真を投稿しました！');
     }
 
     public function show(Photo $photo)
@@ -228,14 +234,28 @@ class PhotoController extends Controller
             abort(403);
         }
 
-        // 投稿に紐づく全画像を削除
-        foreach ($photo->images as $image) {
-            Storage::disk('public')->delete($image->image_path);
-            $image->delete();
+        DB::beginTransaction();
+        try {
+            // 投稿に紐づく全画像を削除（ストレージ + DB）
+            foreach ($photo->images as $image) {
+                // ストレージから画像削除（存在チェック付き）
+                if (Storage::disk('public')->exists($image->image_path)) {
+                    Storage::disk('public')->delete($image->image_path);
+                }
+
+                // DBから画像情報削除
+                $image->delete();
+            }
+
+            // 最後に投稿本体を削除
+            $photo->delete();
+
+            DB::commit();
+            return redirect()->route('photos.index')->with('success', '写真を削除しました！');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', '写真の削除中にエラーが発生しました。');
         }
-
-        $photo->delete();
-
-        return redirect()->route('photos.index')->with('success', '写真を削除しました！');
     }
 }
