@@ -20,7 +20,7 @@ Route::get('/register', [RegisterController::class, 'showForm'])->name('register
 Route::post('/register', [RegisterController::class, 'register'])->name('register.store');
 
 // ログイン
-Route::get('/login', [LoginController::class, 'showForm'])->name('login');
+Route::get('/', [LoginController::class, 'showForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.store');
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
