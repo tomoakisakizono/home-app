@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('item_name'); // 買うもの
             $table->integer('quantity')->default(1); // 数量
             $table->enum('status', ['未購入', '購入済み'])->default('未購入'); // ステータス
-            $table->string('category')->nullable(); // カテゴリ（食材・日用品など）
+            // $table->string('category')->nullable(); // カテゴリ（食材・日用品など）
             $table->date('due_date')->nullable(); // 期限
             $table->text('note')->nullable(); // メモ
             $table->timestamps();
@@ -30,6 +30,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('shopping_lists', function (Blueprint $table) {
+            $table->dropForeign(['category_id']); // 外部キー制約を先に削除
+        });
+        
         Schema::dropIfExists('shopping_lists');
     }
 };
