@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container mb-4">
+        <h2 class="my-3">カレンダー</h2>
     <!-- カレンダー表示 -->
     <div id="calendar" style="min-height: 600px;" class="mb-4"></div>
     @include('partials.alerts')

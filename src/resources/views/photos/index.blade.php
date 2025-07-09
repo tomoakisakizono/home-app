@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="container mb-4">
-    <h2>写真一覧</h2>
+    <h2 class="text-center my-3">写真一覧</h2>
     @include('partials.alerts')
 
     {{-- 写真投稿フォーム --}}

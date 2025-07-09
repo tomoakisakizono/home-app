@@ -3,6 +3,7 @@
 .env.backup
 .env.production
 docker-compose.override.yml
+Home-key.pem
 
 # Ignore Docker database volume
 Docker/DB/volume/
