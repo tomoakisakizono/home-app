@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
     <style>
         body { background-color: #f8f9fa; }
-        .container { margin-top: 20px; }
         footer { background: #0d6efd; color: white; padding: 10px; text-align: center; }
     </style>
 </head>

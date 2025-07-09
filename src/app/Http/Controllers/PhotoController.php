@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Intervention\Image\Laravel\Facades\Image;
 use ZipArchive;
 
 class PhotoController extends Controller
@@ -38,19 +39,19 @@ class PhotoController extends Controller
     {
         $request->validate([
             'images' => 'required|array|max:10',
-            'images.*' => 'image|max:2048',
+            'images.*' => 'file|mimetypes:image/heic,image/heif,image/jpeg,image/png,image/gif,image/webp|max:20480',
             'photo_date' => 'required|date',
             'comment' => 'nullable|string|max:255',
             'category' => 'required|string',
         ]);
-    
+        
         $user = Auth::user();
         $pairId = $user->pair_id;
     
         if (!$pairId) {
             return redirect()->back()->with('error', 'ペアが設定されていません。');
         }
-    
+
         DB::beginTransaction();
         try {
             $photo = Photo::create([

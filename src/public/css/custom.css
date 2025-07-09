@@ -31,7 +31,7 @@
 }
 
 .menu-label {
-    font-size: 0.85rem;     /* 少し小さく */
+    font-size: 0.85rem; /* 少し小さく */
     max-width: 100%;
     overflow: hidden;
 }
@@ -49,5 +49,46 @@
 
 .rounded-circle {
     border: 2px solid #ccc;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.login-page {
+    background-image: url("images/main-visual.jpg");
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 5%;
+
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 100vh;
+    background-color: #f9f9f9;
+}
+
+.left-textbox {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 2rem;
+    border-radius: 1rem;
+    max-width: 500px;
+}
+
+.right-panel {
+    flex: 1;
+    background-color: #f0f2f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.login-box {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
 }

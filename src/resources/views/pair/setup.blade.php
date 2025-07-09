@@ -1,30 +1,49 @@
 @extends('layouts.app')
 
 @section('content')
-    <h2>ペア設定</h2>
+<div class="container py-3">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h4 class="text-center mb-2">ペア設定</h4>
+            @include('partials.alerts')
 
-    <!-- 成功メッセージ（招待コードを含む） -->
-    @include('partials.alerts')
-    
-    <!-- 既存の招待コードがある場合 -->
-    @if(isset($pair) && $pair->invite_code)
-        <h3>発行済みの招待コード</h3>
-        <p><strong>{{ $pair->invite_code }}</strong></p>
-    @endif
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <p class="mb-4 text-muted">
+                        相手のメールアドレスに招待を送信するか、<br>
+                        相手から受け取った招待コードを入力してペアを作成します。
+                    </p>
 
-    <!-- 招待コードを発行 -->
-    <form action="{{ route('pair.invite') }}" method="POST">
-        @csrf
-        <label>相手のメールアドレス:</label>
-        <input type="email" name="email" required>
-        <button type="submit">招待を送信</button>
-    </form>
+                    @if(isset($pair) && $pair->invite_code)
+                        <div class="mb-4">
+                            <h6>発行済みの招待コード</h6>
+                            <p class="h5 font-monospace text-primary">{{ $pair->invite_code }}</p>
+                        </div>
+                    @endif
 
-    <!-- 招待コードでペアに参加 -->
-    <form action="{{ route('pair.accept') }}" method="POST">
-        @csrf
-        <label>招待コード:</label>
-        <input type="text" name="invite_code" required>
-        <button type="submit">ペアに参加</button>
-    </form>
+                    <hr>
+
+                    <form action="{{ route('pair.invite') }}" method="POST" class="mb-4">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="email" class="form-label">相手のメールアドレス</label>
+                            <input type="email" class="form-control" name="email" required placeholder="example@example.com">
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary w-100">招待を送信</button>
+                    </form>
+
+                    <form action="{{ route('pair.accept') }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="invite_code" class="form-label">招待コード</label>
+                            <input type="text" class="form-control" name="invite_code" required placeholder="A1E72DEB">
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">ペアに参加</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 @endsection

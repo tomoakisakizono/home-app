@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('photos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pair_id')->constrained('pairs')->onDelete('cascade'); // ペアIDで管理
-            $table->string('image_path'); // 画像ファイルのパス
+            // $table->string('image_path'); // 画像ファイルのパス
             $table->text('comment')->nullable(); // コメント
             $table->date('photo_date'); // 写真の日付
             $table->string('category'); // カテゴリ（例：子育て、ご飯）

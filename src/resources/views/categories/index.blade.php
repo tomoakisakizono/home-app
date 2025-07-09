@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">カテゴリー管理</h2>
+    <h2 class="text-center my-3">カテゴリー管理</h2>
     <a href="{{ route('shopping.index') }}" class="btn btn-secondary">
         買い物リストに戻る
     </a>

@@ -2,7 +2,7 @@
 
 @section('content')
 
-<h4 class="text-center mb-3 mt-2">ペア編集</h4>
+<h4 class="text-center my-3">ペア編集</h4>
 @include('partials.alerts')
 
 <div class="row justify-content-center align-items-center my-3">

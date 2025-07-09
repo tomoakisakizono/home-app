@@ -27,6 +27,7 @@ class RegisterController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'profile_image' => 'images/default_user.png',
         ]);
 
         // **新規登録後に自動ログイン**
