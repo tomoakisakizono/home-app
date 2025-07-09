@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="container mb-4">
-    <h2>作業リスト</h2>
+    <h2 class="text-center my-3">作業リスト</h2>
     @include('partials.alerts')
 
     {{-- 作業追加フォーム --}}
