@@ -8,6 +8,7 @@ use App\Notifications\PhotoPosted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\PhotoRequest;
 use ZipArchive;
 
 class PhotoController extends Controller
@@ -29,16 +30,8 @@ class PhotoController extends Controller
         return view('photos.index', compact('photos'));
     }
 
-    public function multipleUpload(Request $request)
+    public function multipleUpload(PhotoRequest $request)
     {
-        $request->validate([
-            'images' => 'required|array|max:10',
-            'images.*' => 'file|mimetypes:image/heic,image/heif,image/jpeg,image/png,image/gif,image/webp|max:20480',
-            'photo_date' => 'required|date',
-            'comment' => 'nullable|string|max:255',
-            'category' => 'required|string',
-        ]);
-
         $user = $this->authUser;
 
         DB::beginTransaction();
@@ -97,17 +90,11 @@ class PhotoController extends Controller
         return view('photos.edit', compact('photo'));
     }
 
-    public function update(Request $request, Photo $photo)
+    public function update(PhotoRequest $request, Photo $photo)
     {
         if ($photo->pair_id !== $this->pair->id) {
             abort(403);
         }
-
-        $request->validate([
-            'photo_date' => 'required|date',
-            'category' => 'required|string',
-            'comment' => 'nullable|string|max:255',
-        ]);
 
         $photo->update([
             'photo_date' => $request->photo_date,

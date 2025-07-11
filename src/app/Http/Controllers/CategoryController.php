@@ -16,7 +16,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:50|unique:categories,name'
+            'name' => 'required|string|max:100|unique:categories,name,NULL,id,pair_id,' . $this->authUser->pair_id,
         ]);
 
         Category::create([
