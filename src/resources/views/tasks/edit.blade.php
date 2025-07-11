@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mb-4">
-    <h2>作業を編集</h2>
+    <h2 class="my-4">作業を編集</h2>
     @include('partials.alerts')
 
     <form action="{{ route('tasks.update', $task) }}" method="POST">

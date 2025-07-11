@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mb-4">
-    <h2>写真の編集</h2>
+    <h2 class="my-3">写真の編集</h2>
     @include('partials.alerts')
 
     {{-- 現在の画像一覧と削除ボタン --}}
@@ -57,13 +57,13 @@
                     {{ old('category', $photo->category) == '子ども' ? 'checked' : '' }} required>
                 <label class="btn btn-outline-primary category-btn" for="category_kids">子ども</label>
 
-                <input type="radio" class="btn-check" name="category" id="category_menu" value="メニュー"
-                    {{ old('category', $photo->category) == 'メニュー' ? 'checked' : '' }} required>
-                <label class="btn btn-outline-primary category-btn" for="category_menu">メニュー</label>
+                <input type="radio" class="btn-check" name="category" id="category_menu" value="ごはん"
+                    {{ old('category', $photo->category) == 'ごはん' ? 'checked' : '' }} required>
+                <label class="btn btn-outline-primary category-btn" for="category_menu">ごはん</label>
 
-                <input type="radio" class="btn-check" name="category" id="category_outing" value="お出かけ"
-                    {{ old('category', $photo->category) == 'お出かけ' ? 'checked' : '' }} required>
-                <label class="btn btn-outline-primary category-btn" for="category_outing">お出かけ</label>
+                <input type="radio" class="btn-check" name="category" id="category_outing" value="おでかけ"
+                    {{ old('category', $photo->category) == 'おでかけ' ? 'checked' : '' }} required>
+                <label class="btn btn-outline-primary category-btn" for="category_outing">おでかけ</label>
 
                 <input type="radio" class="btn-check" name="category" id="category_other" value="その他"
                     {{ old('category', $photo->category) == 'その他' ? 'checked' : '' }} required>

@@ -9,7 +9,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::where('pair_id', $this->pair->id)->get();
         return view('categories.index', compact('categories'));
     }
 
@@ -19,7 +19,10 @@ class CategoryController extends Controller
             'name' => 'required|string|max:50|unique:categories,name'
         ]);
 
-        Category::create(['name' => $request->name]);
+        Category::create([
+            'name' => $request->name,
+            'pair_id' => $this->pair->id
+        ]);
 
         return redirect()->route('categories.index')->with('success', 'カテゴリーを追加しました！');
     }
@@ -38,4 +41,3 @@ class CategoryController extends Controller
     }
 
 }
-

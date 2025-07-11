@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 
@@ -12,32 +11,30 @@ class UsersController extends Controller
     // 🔹 ユーザー情報編集画面表示（画像アップロード付き）
     public function edit()
     {
-        $user = Auth::user(); // 自分自身の情報を取得
+        $user = $this->authUser;
 
         if (!$user) {
             abort(404, 'ユーザーが見つかりません');
         }
 
-        // ペア情報の取得
-        $pair = \App\Models\Pair::where(function ($query) use ($user) {
-            $query->where('user1_id', $user->id)
-                ->orWhere('user2_id', $user->id);
-        })->where('status', 'accepted')->first();
-
-        // パートナー情報の取得
+        // パートナー情報の取得（pair は Controller で取得済み）
         $partner = null;
-        if ($pair) {
-            $partnerId = $pair->user1_id === $user->id ? $pair->user2_id : $pair->user1_id;
+        if ($this->pair) {
+            $partnerId = $this->pair->user1_id === $user->id ? $this->pair->user2_id : $this->pair->user1_id;
             $partner = User::find($partnerId);
         }
 
-        return view('users.edit', compact('user', 'pair', 'partner'));
+        return view('users.edit', [
+            'user' => $user,
+            'pair' => $this->pair,
+            'partner' => $partner,
+        ]);
     }
 
-    // プロフィール更新（名前・メール・パスワード）
+    // 🔹 プロフィール更新（名前・メール・パスワード）
     public function update(Request $request)
     {
-        $user = Auth::user();
+        $user = $this->authUser;
 
         $request->validate([
             'name' => 'required|string|max:50',
@@ -64,7 +61,7 @@ class UsersController extends Controller
             'profile_image' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $user = Auth::user();
+        $user = $this->authUser;
 
         if ($request->hasFile('profile_image')) {
             $path = $request->file('profile_image')->store('profile_images', 'public');

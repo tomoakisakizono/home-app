@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mb-4">
-    <h2>写真の詳細</h2>
+    <h2 class="my-3">写真の詳細</h2>
     @include('partials.alerts')
 
     {{-- スライドショー（投稿の画像を切り替え） --}}

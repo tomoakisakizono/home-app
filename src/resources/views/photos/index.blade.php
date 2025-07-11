@@ -29,8 +29,8 @@
                         <option value="">選択してください</option>
                         <option value="家族">家族</option>
                         <option value="子ども">子ども</option>
-                        <option value="メニュー">メニュー</option>
-                        <option value="お出かけ">お出かけ</option>
+                        <option value="ごはん">ごはん</option>
+                        <option value="おでかけ">おでかけ</option>
                         <option value="その他">その他</option>
                     </select>
                 </div>
@@ -101,8 +101,8 @@
                 <option value="">すべて</option>
                 <option value="家族" {{ request('category') == '家族' ? 'selected' : '' }}>家族</option>
                 <option value="子ども" {{ request('category') == '子ども' ? 'selected' : '' }}>子ども</option>
-                <option value="メニュー" {{ request('category') == 'メニュー' ? 'selected' : '' }}>メニュー</option>
-                <option value="お出かけ" {{ request('category') == 'お出かけ' ? 'selected' : '' }}>お出かけ</option>
+                <option value="ごはん" {{ request('category') == 'ごはん' ? 'selected' : '' }}>ごはん</option>
+                <option value="おでかけ" {{ request('category') == 'おでかけ' ? 'selected' : '' }}>おでかけ</option>
                 <option value="その他" {{ request('category') == 'その他' ? 'selected' : '' }}>その他</option>
             </select>
             <button type="submit" class="btn btn-primary h-100">検索</button>

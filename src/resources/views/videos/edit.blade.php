@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="container mb-4">
-    <h2>動画編集</h2>
+    <h2 class="text-center my-4">動画編集</h2>
     @include('partials.alerts')
 
     <form action="{{ route('videos.update', $video) }}" method="POST">
