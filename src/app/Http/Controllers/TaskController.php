@@ -8,6 +8,7 @@ use App\Notifications\TaskCreated;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use App\Http\Requests\TaskRequest;
 
 class TaskController extends Controller
 {
@@ -36,18 +37,8 @@ class TaskController extends Controller
         return view('tasks.index', compact('tasks'));
     }
 
-    public function create()
+    public function store(TaskRequest $request)
     {
-        return view('tasks.create');
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'due_date' => 'required|date',
-        ]);
-
         DB::beginTransaction();
         try {
             $task = Task::create([
@@ -74,26 +65,15 @@ class TaskController extends Controller
         }
     }
 
-    public function show(string $id)
-    {
-        //
-    }
-
     public function edit(Task $task)
     {
         $this->authorizeAccess($task);
         return view('tasks.edit', compact('task'));
     }
 
-    public function update(Request $request, Task $task)
+    public function update(TaskRequest $request, Task $task)
     {
         $this->authorizeAccess($task);
-
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'due_date' => 'required|date',
-            'is_done' => 'boolean',
-        ]);
 
         $task->update([
             'title' => $request->title,

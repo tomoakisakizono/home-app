@@ -8,6 +8,7 @@ use App\Models\ShoppingList;
 use App\Models\User;
 use App\Models\Category;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\ShoppingListRequest;
 
 class ShoppingListController extends Controller
 {
@@ -27,14 +28,8 @@ class ShoppingListController extends Controller
         return view('shopping.index', compact('categories', 'shoppingLists'));
     }
 
-    public function store(Request $request)
+    public function store(ShoppingListRequest $request)
     {
-        $request->validate([
-            'item_name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:1',
-            'category_id' => 'nullable|exists:categories,id',
-        ]);
-
         DB::beginTransaction();
         try {
             $item = ShoppingList::create([

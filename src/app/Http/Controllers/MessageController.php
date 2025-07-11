@@ -7,6 +7,7 @@ use App\Models\Message;
 use App\Models\Calendar;
 use App\Notifications\MessagePosted;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\MessageRequest;
 
 class MessageController extends Controller
 {
@@ -20,16 +21,8 @@ class MessageController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(MessageRequest $request)
     {
-        $request->validate([
-            'content' => 'required|string|max:255',
-            'event_date' => 'nullable|date',
-            'event_time' => 'nullable|date_format:H:i',
-            'event_title' => 'nullable|string|max:100',
-            'event_description' => 'nullable|string|max:255',
-        ]);
-
         DB::beginTransaction();
         try {
             $calendar = null;
@@ -73,10 +66,8 @@ class MessageController extends Controller
         return view('messages.edit', compact('message'));
     }
 
-    public function update(Request $request, $id)
+    public function update(MessageRequest $request, $id)
     {
-        $request->validate(['content' => 'required|string|max:255']);
-
         $message = Message::where('id', $id)->where('user_id', $this->authUser->id)->firstOrFail();
         $message->update(['content' => $request->content]);
 

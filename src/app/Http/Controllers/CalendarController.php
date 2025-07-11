@@ -7,6 +7,7 @@ use App\Models\Calendar;
 use App\Models\User;
 use App\Notifications\CalendarEventCreated;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\CalendarRequest;
 
 class CalendarController extends Controller
 {
@@ -19,15 +20,8 @@ class CalendarController extends Controller
         return view('calendar.index', compact('events'));
     }
 
-    public function store(Request $request)
+    public function store(CalendarRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'event_date' => 'required|date',
-            'event_time' => 'nullable',
-            'description' => 'nullable|string',
-        ]);
-
         DB::beginTransaction();
         try {
             $calendar = Calendar::create([
@@ -67,15 +61,8 @@ class CalendarController extends Controller
         return view('calendar.edit', compact('event'));
     }
 
-    public function update(Request $request, $id)
+    public function update(CalendarRequest $request, $id)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'event_date' => 'required|date',
-            'event_time' => 'nullable|date_format:H:i',
-            'description' => 'nullable|string|max:1000',
-        ]);
-
         $event = Calendar::findOrFail($id);
 
         if ($event->pair_id !== $this->pair?->id) {
