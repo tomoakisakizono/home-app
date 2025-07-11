@@ -2,26 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Calendar;
-use App\Models\Pair;
+use App\Models\User;
 use App\Notifications\CalendarEventCreated;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class CalendarController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-        $pairId = $user->pair_id;
-
-        if (!$pairId) {
-            return redirect()->route('pair.setup')->with('error', 'ペアを設定してください。');
-        }
-
-        $events = Calendar::where('pair_id', $pairId)
+        $events = Calendar::where('pair_id', $this->pair->id)
             ->orderBy('event_date', 'asc')
             ->get();
 
@@ -36,34 +27,27 @@ class CalendarController extends Controller
             'event_time' => 'nullable',
             'description' => 'nullable|string',
         ]);
-    
-        $user = Auth::user();
-        $pairId = $user->pair_id;
-    
-        if (!$pairId) {
-            return redirect()->route('pair.setup')->with('error', 'ペアを設定してください。');
-        }
-    
+
         DB::beginTransaction();
         try {
             $calendar = Calendar::create([
-                'pair_id' => $pairId,
-                'user_id' => $user->id,
+                'pair_id' => $this->pair->id,
+                'user_id' => $this->authUser->id,
                 'title' => $request->title,
                 'event_date' => $request->event_date,
                 'event_time' => $request->event_time,
                 'description' => $request->description,
             ]);
-    
-            $partner = \App\Models\User::where('pair_id', $pairId)
-                        ->where('id', '!=', $user->id)
+
+            $partner = User::where('pair_id', $this->pair->id)
+                        ->where('id', '!=', $this->authUser->id)
                         ->first();
-    
+
             if ($partner) {
-                $calendar->user = $user;
+                $calendar->user = $this->authUser;
                 $partner->notify(new CalendarEventCreated($calendar));
             }
-    
+
             DB::commit();
             return redirect()->route('calendar.index')->with('success', '予定を追加しました！');
         } catch (\Exception $e) {
@@ -76,8 +60,7 @@ class CalendarController extends Controller
     {
         $event = Calendar::findOrFail($id);
 
-        // 認可：ログインユーザーのペアIDが一致するかチェック
-        if ($event->pair_id !== Auth::user()->pair_id) {
+        if ($event->pair_id !== $this->pair?->id) {
             abort(403, '許可されていません');
         }
 
@@ -95,7 +78,7 @@ class CalendarController extends Controller
 
         $event = Calendar::findOrFail($id);
 
-        if ($event->pair_id !== Auth::user()->pair_id) {
+        if ($event->pair_id !== $this->pair?->id) {
             abort(403, '許可されていません');
         }
 
@@ -110,7 +93,7 @@ class CalendarController extends Controller
             return back()->with('error', '予定の更新に失敗しました。')->withInput();
         }
     }
-    
+
     public function destroy($id)
     {
         $event = Calendar::findOrFail($id);
@@ -119,4 +102,3 @@ class CalendarController extends Controller
         return redirect()->route('calendar.index')->with('success', '予定を削除しました！');
     }
 }
-

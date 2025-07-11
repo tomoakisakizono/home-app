@@ -1,11 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center">
     <h2 class="text-center my-3">買い物リスト</h2>
     <!-- 🔹 カテゴリー管理ページへのリンクボタン -->
     <a href="{{ route('categories.index') }}" class="btn btn-outline-primary">カテゴリー管理</a>
 </div>
+    <p class="mb-3">カテゴリを登録すると、カテゴリごとに表示されるよ</p>
+
 @include('partials.alerts')
 
 <!-- 🔹 買い物リスト追加フォーム -->

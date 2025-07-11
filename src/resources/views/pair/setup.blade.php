@@ -4,7 +4,7 @@
 <div class="container py-3">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <h4 class="text-center mb-2">ペア設定</h4>
+            <h4 class="text-center my-4">ペア設定</h4>
             @include('partials.alerts')
 
             <div class="card shadow-sm">
