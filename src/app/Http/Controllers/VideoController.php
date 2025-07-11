@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Video;
 use App\Notifications\VideoPosted;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\VideoRequest;
 
 class VideoController extends Controller
 {
@@ -29,15 +30,8 @@ class VideoController extends Controller
         //
     }
 
-    public function store(Request $request)
+    public function store(VideoRequest $request)
     {
-        $request->validate([
-            'youtube_url' => 'required|url',
-            'comment' => 'nullable|string|max:255',
-            'category' => 'required|string',
-            'registered_at' => 'required|date',
-        ]);
-
         $user = $this->authUser;
         $pair = $this->pair;
 
@@ -83,18 +77,11 @@ class VideoController extends Controller
         return view('videos.edit', compact('video'));
     }
 
-    public function update(Request $request, Video $video)
+    public function update(VideoRequest $request, Video $video)
     {
         if ($video->pair_id !== $this->pair->id) {
             abort(403);
         }
-
-        $request->validate([
-            'youtube_url' => 'required|url',
-            'comment' => 'nullable|string|max:255',
-            'category' => 'required|string',
-            'registered_at' => 'required|date',
-        ]);
 
         $video->update([
             'youtube_url' => $request->youtube_url,
