@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="text-center">プロフィール編集</h2>
+    <h2 class="text-center my-4">プロフィール編集</h2>
 
     <div class="row justify-content-center align-items-center my-3">
         <!-- 自分 -->

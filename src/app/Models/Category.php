@@ -9,11 +9,15 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'pair_id'];
 
     public function shoppingLists()
     {
         return $this->hasMany(ShoppingList::class);
     }
-}
 
+    public function pair()
+    {
+        return $this->belongsTo(Pair::class);
+    }
+}

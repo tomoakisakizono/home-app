@@ -59,4 +59,9 @@ class Pair extends Model
     {
         return $this->pair_image ? Storage::url($this->pair_image) : asset('images/default_pair.png');
     }
+
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
 }

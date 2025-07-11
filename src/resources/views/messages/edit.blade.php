@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mb-3">
-    <h2>メッセージ編集</h2>
+    <h2 class="text-center my-4">メッセージ編集</h2>
     @include('partials.alerts')
 
     <form action="{{ route('messages.update', $message->id) }}" method="POST">
