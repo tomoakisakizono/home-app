@@ -33,12 +33,7 @@ abstract class Controller extends BaseController
                 })->where('status', 'accepted')->first();
 
                 View::share('pair', $this->pair);
-
-                // ✅ 家族メンバーも全画面で共有可能にする
-                $members = $this->getMembers();
-                View::share('members', $members);
             }
-
             return $next($request);
         });
     }
@@ -48,12 +43,8 @@ abstract class Controller extends BaseController
         return $this->authUser;
     }
 
-    protected function getMembers()
+    protected function getPair()
     {
-        return Auth::user()
-            ->family
-            ->users()
-            ->where('id', '!=', Auth::id())
-            ->get();
+        return $this->pair;
     }
 }

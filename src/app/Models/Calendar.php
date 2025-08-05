@@ -20,7 +20,6 @@ class Calendar extends Model
         'event_date',
         'event_time',
         'description',
-        'family_id',
     ];
 
     // 🔹 event_date を `date` 型としてキャスト
