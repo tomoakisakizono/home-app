@@ -7,14 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory;
-    use Notifiable;
+    use HasFactory, Notifiable;
     use SoftDeletes;
 
     /**
@@ -52,13 +49,25 @@ class User extends Authenticatable
         ];
     }
 
-    public function pair(): BelongsTo
+    public function pairAsUser1()
+    {
+        return $this->hasOne(Pair::class, 'user1_id');
+    }
+
+    public function pairAsUser2()
+    {
+        return $this->hasOne(Pair::class, 'user2_id');
+    }
+
+    public function pair()
     {
         return $this->belongsTo(Pair::class);
     }
 
-    public function family()
+    public function pairUser()
     {
-        return $this->belongsTo(Family::class);
+        return $this->belongsTo(User::class, 'id', 'user1_id')
+                ->orWhere('id', '<>', $this->id);
     }
+
 }
