@@ -94,7 +94,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('tasks', TaskController::class);
     Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
 
-    // ===== 通知関連 =====
+    // ====== 通知関連 ======
     Route::get('/notifications/read', function () {
         auth()->user()->unreadNotifications->markAsRead();
         return response()->json(['status' => 'ok']);
