@@ -9,25 +9,15 @@ class Message extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['content', 'scheduled_at', 'family_id', 'receiver_id', 'is_read', 'sender_id'];
+    protected $fillable = ['user_id', 'pair_id', 'content', 'scheduled_at'];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'sender_id');
+        return $this->belongsTo(User::class);
     }
 
-    public function family()
+    public function pair()
     {
-        return $this->belongsTo(Family::class);
-    }
-
-    public function sender()
-    {
-        return $this->belongsTo(User::class, 'sender_id');
-    }
-
-    public function receiver()
-    {
-        return $this->belongsTo(User::class, 'receiver_id');
+        return $this->belongsTo(Pair::class);
     }
 }

@@ -37,7 +37,7 @@ class MessagePosted extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
                     ->line('The introduction to the notification.')
                     ->action('Notification Action', url('/'))
                     ->line('Thank you for using our application!');
@@ -62,7 +62,7 @@ class MessagePosted extends Notification
     {
         return [
             'message' => $this->message->user->name . 'さんがメッセージを投稿しました。',
-            'link' => route('messages.user', $this->message->receiver_id ?? $notifiable->id), // 任意の遷移先
+            'link' => route('messages.index'), // 任意の遷移先
         ];
     }
 }
