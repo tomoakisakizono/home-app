@@ -14,7 +14,7 @@
 
         <!-- 💡 メニューリスト -->
         <div class="list-group">
-          <a href="{{ route('messages.family') }}" class="list-group-item list-group-item-action">
+          <a href="{{ route('messages.index') }}" class="list-group-item list-group-item-action">
             💬 メッセージ
           </a>
           <a href="{{ route('calendar.index') }}" class="list-group-item list-group-item-action">
