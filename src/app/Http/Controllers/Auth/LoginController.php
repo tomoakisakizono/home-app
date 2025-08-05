@@ -25,7 +25,7 @@ class LoginController extends Controller
             if (!$userId) {
                 return back()->withErrors(['email' => 'ログイン後にエラーが発生しました。']);
             }
-            return redirect()->route('dashboard', ['id' => $userId])->with('success', 'ログインしました！');
+            return redirect()->route('pair.show', ['id' => $userId])->with('success', 'ログインしました！');
         }
         return back()->withErrors(['email' => 'メールアドレスまたはパスワードが正しくありません。']);
     }
