@@ -7,7 +7,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 @if(Auth::check())
-                <li class="nav-item"><a class="nav-link text-white" href="{{ route('dashboard') }}">メインメニュー</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="{{ route('pair.show') }}">メインメニュー</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="{{ route('users.edit') }}">ユーザー編集</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="{{ route('pair.edit') }}">ペア編集</a></li>
                 <li class="nav-item">
