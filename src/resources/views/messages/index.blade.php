@@ -1,81 +1,136 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mb-4">
-    <h2 class="text-center my-3">メッセージ</h2>
-    @include('partials.alerts')
+<style>
+    .chat-box {
+        background-color: #ffffff;
+        color: #212529;
+        padding: 16px;
+        border-radius: 12px;
+        height: 65vh;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+    }
 
-    <!-- 🔹 投稿フォーム -->
-    <div class="card p-3 mb-3">
-        <form action="{{ route('messages.store') }}" method="POST">
-            @csrf
-            <div class="row g-2 align-items-start">
-                <div class="col-12 col-md-10">
-                    <input type="text" class="form-control" name="content" placeholder="メッセージを入力" required>
-                </div>
-                <div class="col-12 col-md-2 d-grid">
-                    <button type="submit" class="btn btn-primary w-100">投稿</button>
-                </div>
-            </div>
+    .message-left, .message-right {
+        max-width: 75%;
+        padding: 10px 14px;
+        border-radius: 18px;
+        margin-bottom: 12px;
+        display: inline-block;
+        word-wrap: break-word;
+        line-height: 1.5;
+    }
 
-            <!-- 🔸 カレンダー連携 -->
-            <div class="mt-3">
-                <h5 class="mb-2">カレンダー連携</h5>
-                <div class="row g-2">
-                    <div class="col-6 col-md-3">
-                        <input type="date" class="form-control" name="event_date" placeholder="日付">
-                    </div>
-                    <div class="col-6 col-md-2">
-                        <input type="time" class="form-control" name="event_time" placeholder="時間">
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <input type="text" class="form-control" name="event_title" placeholder="予定タイトル">
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <input type="text" class="form-control" name="event_description" placeholder="詳細（任意）">
-                    </div>
-                </div>
-            </div>
-        </form>
+    .message-left {
+        background-color: #f1f3f5;
+        color: #212529;
+        border-bottom-left-radius: 4px;
+        margin-right: auto;
+    }
+
+    .message-right {
+        background-color: #d0ebff;
+        color: #0c5460;
+        border-bottom-right-radius: 4px;
+        margin-left: auto;
+    }
+
+    .message-meta {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-top: 4px;
+        text-align: right;
+    }
+
+    .chat-input {
+        background-color: #fff;
+        color: #212529;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+    }
+
+    .chat-input:focus {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+    .send-btn {
+        border-radius: 8px;
+        margin-left: 10px;
+        padding: 0.75rem 1.25rem;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="d-flex overflow-auto px-3 py-2 border-bottom gap-3 align-items-center">
+        {{-- 家族全体 --}}
+        @include('messages.family_nav')
+
+        {{-- 各メンバー --}}
+        @include('messages.member_nav')
     </div>
 
-    <!-- 🔹 メッセージ一覧 -->
-    @foreach($messages as $message)
-        <div class="border border-light rounded bg-light p-3 mb-3">
-            <div class="fw-bold mb-1">{{ $message->user->name }}：</div>
-            <div class="p-2 rounded bg-success-subtle">{{ $message->content }}</div>
+    <h4 class="mt-2">送信先：{{ $chatPartner->name ?? '家族全体' }}</h4>
 
-            @if($message->calendar)
-                <div class="text-success small mt-2">
-                    📅 {{ \Carbon\Carbon::parse($message->calendar->event_date)->format('n/j') }}
-                    @if($message->calendar->event_time)
-                        {{ \Carbon\Carbon::parse($message->calendar->event_time)->format('H:i') }}
-                    @endif
-                    ：{{ $message->calendar->title }}
-                    @if($message->calendar->description)
-                        （{{ $message->calendar->description }}）
-                    @endif
+    @include('partials.alerts')
+
+    <div id="chat-scroll" class="chat-box d-flex flex-column mb-3 shadow-sm">
+        @php
+            $previousDate = null;
+        @endphp
+
+        @forelse ($messages as $message)
+            @php
+                $messageDate = $message->created_at->format('Y年n月j日（D）');
+            @endphp
+
+            {{-- 日付が変わったら表示 --}}
+            @if ($previousDate !== $messageDate)
+                <div class="text-center my-2 text-muted small">
+                    {{ $messageDate }}
                 </div>
+                @php $previousDate = $messageDate; @endphp
             @endif
 
-            <div class="d-flex justify-content-between align-items-center mt-2">
-                <small class="text-muted">{{ $message->created_at->diffForHumans() }}</small>
-
-                @if($message->user_id === auth()->id())
-                    <div class="d-flex gap-2">
-                        <a href="{{ route('messages.edit', $message->id) }}" class="btn btn-sm btn-warning">編集</a>
-                        <form action="{{ route('messages.destroy', $message->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">削除</button>
-                        </form>
-                    </div>
-                @endif
+            <div class="@if ($message->sender_id === auth()->id()) message-right @else message-left @endif">
+                {{ $message->content }}
+                <div class="message-meta">
+                    @if ($message->sender_id === auth()->id())
+                        {{ $message->created_at->format('H:i') }}
+                    @else
+                        {{ $message->sender->name ?? '匿名' }}・{{ $message->created_at->format('H:i') }}
+                    @endif
+                </div>
             </div>
-        </div>
-    @endforeach
+        @empty
+            <p class="text-muted">まだメッセージがありません。</p>
+        @endforelse
+    </div>
+
+    <form action="{{ route('messages.store') }}" method="POST" class="d-flex align-items-center">
+        @csrf
+
+        @if (isset($chatPartner))
+            <input type="hidden" name="receiver_id" value="{{ $chatPartner->id }}">
+        @endif
+        
+        <input type="text" name="content" placeholder="メッセージを入力..." class="form-control chat-input" required>
+        <button type="submit" class="btn btn-primary rounded-circle px-3 send-btn"> <i class="bi bi-send-fill"></i></button>
+    </form>
+
+    <div class="text-center mt-4">
+        <a href="{{ route('pair.show') }}" class="btn btn-secondary mb-3">ペアページへ戻る</a>
+    </div>
 </div>
-<div class="d-flex justify-content-center mt-3 mb-3">
-    <a href="{{ route('pair.show') }}" class="btn btn-secondary">ペアページへ</a>
-</div>
+
+<script>
+    // 自動スクロール
+    const chat = document.getElementById('chat-scroll');
+    if (chat) {
+        chat.scrollTop = chat.scrollHeight;
+    }
+</script>
 @endsection

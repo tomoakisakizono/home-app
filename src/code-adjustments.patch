@@ -1,0 +1,28 @@
+From 0e914f484a9dd71b07090a822bf77b0b69e1290a Mon Sep 17 00:00:00 2001
+From: tomoakisakizono <123532464+tomoakisakizono@users.noreply.github.com>
+Date: Tue, 5 Aug 2025 13:02:44 +0900
+Subject: [PATCH] =?UTF-8?q?=E3=83=80=E3=83=9F=E3=83=BCcommit?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ src/routes/web.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/routes/web.php b/src/routes/web.php
+index 060c31f..97cbc11 100644
+--- a/src/routes/web.php
++++ b/src/routes/web.php
+@@ -94,7 +94,7 @@
+     Route::resource('tasks', TaskController::class);
+     Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
+ 
+-    // ===== 通知関連 =====
++    // ====== 通知関連 ======
+     Route::get('/notifications/read', function () {
+         auth()->user()->unreadNotifications->markAsRead();
+         return response()->json(['status' => 'ok']);
+-- 
+2.39.1
+
