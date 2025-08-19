@@ -29,7 +29,7 @@
             <h5><i class="bi bi-calendar-event me-2"></i>今日の予定</h5>
             @if($todayEvent)
                 <p>
-                    {{ \Carbon\Carbon::parse($todayEvent->event_time)->format('H:i') }}　
+                    {{ \Carbon\Carbon::parse($todayEvent->event_time)->format('H:i') }}
                     {{ $todayEvent->title }}
                 </p>
             @else
