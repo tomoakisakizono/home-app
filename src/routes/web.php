@@ -15,6 +15,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PairController; // ★ 旧ペア機能を使うために追加
 
 // ========== 認証関連 ==========
 
@@ -94,11 +96,13 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('tasks', TaskController::class);
     Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
 
-    // ====== 通知関連 ======
-    Route::get('/notifications/read', function () {
-        auth()->user()->unreadNotifications->markAsRead();
-        return response()->json(['status' => 'ok']);
-    })->name('notifications.read');
+    // ====== 通知関連（Controller に統一） ======
+    // 一覧表示（UI）
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    // 未読件数（ヘッダーバッジ用）
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+    // すべて既読（★ 旧 /notifications/read を置き換え）
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
 
     // ===== ペア機能（旧構成：削除予定） =====
     Route::prefix('pair')->name('pair.')->group(function () {

@@ -51,5 +51,8 @@
             }
         }, 20000);
     </script>
+    
+    <script src="{{ asset('js/notifications.js') }}"></script>
+
 </body>
 </html>
