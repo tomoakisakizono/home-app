@@ -38,6 +38,7 @@ class PhotoController extends Controller
         try {
             $photo = Photo::create([
                 'pair_id' => $this->pair->id,
+                'family_id' => $user->family_id,
                 'user_id' => $user->id,
                 'photo_date' => $request->photo_date,
                 'comment' => $request->comment,

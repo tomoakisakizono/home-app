@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+// ===== 認証 =====
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
+// ===== 画面コントローラ =====
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\FamilyController;
@@ -16,9 +18,9 @@ use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\PairController; // ★ 旧ペア機能を使うために追加
+use App\Http\Controllers\PairController;
 
-// ========== 認証関連 ==========
+// ==================== Public（認証前） ====================
 
 // 登録
 Route::get('/register', [RegisterController::class, 'showForm'])->name('register.form');
@@ -29,82 +31,111 @@ Route::get('/', [LoginController::class, 'showForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.store');
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
-// /home リダイレクト
-Route::get('/home', fn () => redirect()->route('dashboard'));
+// 旧URLの恒久リダイレクト
+Route::permanentRedirect('/home', '/dashboard');
 
-// ========== 認証後の機能 ==========
+// ==================== Private（認証後） ====================
+Route::middleware('auth')->group(function () {
 
-Route::middleware(['auth'])->group(function () {
-
-    // ===== ダッシュボード =====
+    // ----- ダッシュボード -----
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ===== ユーザー関連 =====
-    Route::get('/users/edit', [UsersController::class, 'edit'])->name('users.edit');
-    Route::put('/users/update', [UsersController::class, 'update'])->name('users.update');
-    Route::post('/users/update-image', [UsersController::class, 'updateImage'])->name('users.updateImage');
-
-    // ===== ファミリー関連 =====
-    Route::get('/family', [FamilyController::class, 'show'])->name('family.show');
-    Route::post('/family/invite-code', [FamilyController::class, 'generateInviteCode'])->name('family.invite');
-    Route::get('/family/invite', [FamilyController::class, 'inviteForm'])->name('family.invite.form');
-    Route::post('/family/invite/send', [FamilyController::class, 'sendInvite'])->name('family.invite.send');
-    Route::get('/family/join', [FamilyController::class, 'showJoinForm'])->name('family.join');
-    Route::post('/family/join', [FamilyController::class, 'joinFamily'])->name('family.join.post');
-
-    // 管理者によるメンバー作成
-    Route::get('/family/member/create', [FamilyMemberController::class, 'create'])->name('family.member.create');
-    Route::post('/family/member', [FamilyMemberController::class, 'store'])->name('family.member.store');
-
-    // ===== メッセージ関連（family構成） =====
-    Route::get('/messages/family', [MessageController::class, 'familyChat'])->name('messages.family');
-    Route::get('/messages/{user}', [MessageController::class, 'userChat'])->name('messages.user');
-    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
-
-    // ===== カレンダー =====
-    Route::resource('calendar', CalendarController::class);
-
-    // ===== 買い物リスト =====
-    Route::prefix('shopping')->name('shopping.')->group(function () {
-        Route::get('/', [ShoppingListController::class, 'index'])->name('index');
-        Route::post('/', [ShoppingListController::class, 'store'])->name('store');
-        Route::post('/{id}/status', [ShoppingListController::class, 'updateStatus'])->name('updateStatus');
-        Route::delete('/{id}', [ShoppingListController::class, 'destroy'])->name('destroy');
+    // ----- ユーザー設定（プロフィール） -----
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/edit', [UsersController::class, 'edit'])->name('edit');
+        Route::put('/update', [UsersController::class, 'update'])->name('update');
+        Route::post('/update-image', [UsersController::class, 'updateImage'])->name('updateImage');
     });
 
-    // ===== カテゴリ =====
-    Route::resource('categories', CategoryController::class)->only(['index', 'store', 'destroy']);
+    // ----- ファミリー -----
+    Route::prefix('family')->name('family.')->group(function () {
+        Route::get('/', [FamilyController::class, 'show'])->name('show');
 
-    // ===== 写真共有 =====
+        // 招待
+        Route::get('/invite', [FamilyController::class, 'inviteForm'])->name('invite.form');
+        Route::post('/invite-code', [FamilyController::class, 'generateInviteCode'])->name('invite.code');
+        Route::post('/invite/send', [FamilyController::class, 'sendInvite'])->name('invite.send');
+
+        // 参加
+        Route::get('/join', [FamilyController::class, 'showJoinForm'])->name('join.form');
+        Route::post('/join', [FamilyController::class, 'joinFamily'])->name('join');
+
+        // メンバー作成（管理者）
+        Route::get('/member/create', [FamilyMemberController::class, 'create'])->name('member.create');
+        Route::post('/member', [FamilyMemberController::class, 'store'])->name('member.store');
+    });
+
+    // ----- メッセージ -----
+    Route::prefix('messages')->name('messages.')->group(function () {
+        // 一覧（まずは選択画面へ）
+        Route::get('/', fn () => redirect()->route('messages.select'))->name('index');
+
+        // 家族全体チャット
+        Route::get('/family', [MessageController::class, 'familyChat'])->name('family');
+
+        // 個別チャット（Route Model Binding: {user}）
+        Route::get('/user/{user}', [MessageController::class, 'userChat'])->name('user');
+
+        // 投稿
+        Route::post('/', [MessageController::class, 'store'])->name('store');
+
+        // ルーティング上の「選択」ビュー（簡易）
+        Route::view('/select', 'messages.select')->name('select');
+    });
+
+    // ----- カレンダー -----
+    // URLは /calendar に統一（resource 名も calendar.XXX）
+    Route::resource('calendar', CalendarController::class)->names('calendar');
+
+    // ----- 買い物リスト -----
+    Route::prefix('shopping')->name('shopping.')->group(function () {
+        Route::get('/', [ShoppingListController::class, 'index'])->name('index');     // GET  /shopping
+        Route::post('/', [ShoppingListController::class, 'store'])->name('store');    // POST /shopping
+        Route::post('/{id}/status', [ShoppingListController::class, 'updateStatus'])
+            ->whereNumber('id')->name('updateStatus');
+        Route::delete('/{id}', [ShoppingListController::class, 'destroy'])
+            ->whereNumber('id')->name('destroy');
+    });
+
+    // ----- カテゴリ -----
+    Route::resource('categories', CategoryController::class)
+        ->only(['index', 'store', 'destroy'])
+        ->names('categories');
+
+    // ----- 写真 -----
     Route::prefix('photos')->name('photos.')->group(function () {
         Route::get('/', [PhotoController::class, 'index'])->name('index');
         Route::post('/', [PhotoController::class, 'store'])->name('store');
         Route::post('/multiple-upload', [PhotoController::class, 'multipleUpload'])->name('multipleUpload');
-        Route::get('/{photo}', [PhotoController::class, 'show'])->name('show');
-        Route::get('/{photo}/edit', [PhotoController::class, 'edit'])->name('edit');
-        Route::put('/{photo}', [PhotoController::class, 'update'])->name('update');
-        Route::get('/download/{photoImage}', [PhotoController::class, 'download'])->name('download');
-        Route::get('/download-all/{photo}', [PhotoController::class, 'downloadAll'])->name('downloadAll');
-        Route::delete('/{photo}/images/{photoImage}', [PhotoController::class, 'deleteImage'])->name('deleteImage');
-        Route::delete('/{photo}', [PhotoController::class, 'destroy'])->name('destroy');
+
+        Route::get('/{photo}', [PhotoController::class, 'show'])->whereNumber('photo')->name('show');
+        Route::get('/{photo}/edit', [PhotoController::class, 'edit'])->whereNumber('photo')->name('edit');
+        Route::put('/{photo}', [PhotoController::class, 'update'])->whereNumber('photo')->name('update');
+
+        Route::get('/download/{photoImage}', [PhotoController::class, 'download'])->whereNumber('photoImage')->name('download');
+        Route::get('/download-all/{photo}', [PhotoController::class, 'downloadAll'])->whereNumber('photo')->name('downloadAll');
+
+        Route::delete('/{photo}/images/{photoImage}', [PhotoController::class, 'deleteImage'])
+            ->whereNumber('photo')->whereNumber('photoImage')->name('deleteImage');
+        Route::delete('/{photo}', [PhotoController::class, 'destroy'])->whereNumber('photo')->name('destroy');
     });
 
-    // ===== 動画共有 =====
-    Route::resource('videos', VideoController::class);
+    // ----- 動画 -----
+    Route::resource('videos', VideoController::class)->names('videos');
 
-    // ===== タスクリスト =====
-    Route::resource('tasks', TaskController::class);
-    Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
+    // ----- タスク -----
+    Route::resource('tasks', TaskController::class)->names('tasks');
+    Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])
+        ->whereNumber('task')->name('tasks.toggle');
 
-    // ====== 通知関連（Controller に統一） ======
-    // 一覧表示（UI）
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    // 未読件数（ヘッダーバッジ用）
-    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
-    // すべて既読（★ 旧 /notifications/read を置き換え）
-    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+    // ----- 通知 -----
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index'); // /notifications
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread-count');
+        Route::post('/mark-all-read', [NotificationController::class, 'markAllRead'])->name('mark-all-read');
+    });
 
-    // ===== ペア機能（旧構成：削除予定） =====
+    // ----- 旧ペア機能（将来削除） -----
     Route::prefix('pair')->name('pair.')->group(function () {
         Route::get('/', [PairController::class, 'show'])->name('show');
         Route::get('/setup', [PairController::class, 'setup'])->name('setup');
@@ -113,6 +144,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/edit', [PairController::class, 'edit'])->name('edit');
         Route::post('/update_image', [PairController::class, 'updateImage'])->name('update_image');
         Route::post('/update_name', [PairController::class, 'updateName'])->name('update_name');
-        Route::post('/decline/{pair_id}', [PairController::class, 'decline'])->name('decline');
+        Route::post('/decline/{pair_id}', [PairController::class, 'decline'])->whereNumber('pair_id')->name('decline');
     });
 });
