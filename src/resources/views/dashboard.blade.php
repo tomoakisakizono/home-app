@@ -1,201 +1,221 @@
 @extends('layouts.app')
 
-@php
-    use Illuminate\Support\Str;
-@endphp
+@section('title', 'Dashboard')
 
 @section('content')
-<div class="container py-4">
+<div class="container py-4" style="max-width:980px;">
 
-    {{-- ✅ ファミリーネームの表示 + 通知ベル --}}
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-        <h4 class="mb-0">ようこそ、{{ optional(auth()->user()->family)->name }} さん</h4>
+    {{-- ヘッダ：アバター + 家族名 + 通知ベル（明るいトーン） --}}
+    <div class="d-flex align-items-center justify-content-between mb-3 p-3 rounded-4 shadow-sm"
+         style="background:linear-gradient(90deg,#f8f9fa,#ffffff);">
+        <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-light border me-3" style="width:48px;height:48px;"></div>
+            <h3 class="m-0 text-dark">{{ $family->name ?? 'Your Family' }}</h3>
+        </div>
 
-        {{-- 🔔 通知ベル（ドロップダウン） --}}
-        <div class="dropdown">
-            <button class="btn btn-light border position-relative" id="notifDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false" aria-label="通知">
-                <i class="bi bi-bell"></i>
-                <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {{ ($unreadCount ?? 0) > 0 ? '' : 'd-none' }}">
-                    {{ $unreadCount ?? 0 }}
+        {{-- 通知ページ自体はdashboardでは非表示要件の“お知らせ一覧”に該当するため、リンクは残しつつボタンは控えめに --}}
+        <a href="{{ route('notifications.index') }}" class="btn btn-outline-primary position-relative" aria-label="Notifications">
+            <i class="bi bi-bell"></i>
+            @if(($unreadNotificationCount ?? 0) > 0)
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ $unreadNotificationCount }}
                 </span>
-            </button>
-            <div class="dropdown-menu dropdown-menu-end p-0 shadow-sm" aria-labelledby="notifDropdownBtn" style="min-width: 340px;">
-                <div class="p-3 border-bottom">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <strong>最近の通知</strong>
-                        <form id="notifMarkAllForm" method="POST" action="{{ route('notifications.mark-all-read') }}">
-                            @csrf
-                            <button type="submit" class="btn btn-sm btn-outline-secondary">すべて既読</button>
-                        </form>
-                    </div>
-                </div>
-
-                {{-- 最近の通知リスト（サーバーで渡せない場合は空でOK） --}}
-                <div id="notifList" class="list-group list-group-flush">
-                    @isset($recentNotifications)
-                        @forelse($recentNotifications->take(5) as $n)
-                            @php $data = $n->data; @endphp
-                            <a href="{{ $data['url'] ?? route('notifications.index') }}"
-                               class="list-group-item list-group-item-action d-flex justify-content-between">
-                                <div class="me-3">
-                                    <div class="fw-semibold">{{ $data['title'] ?? 'お知らせ' }}</div>
-                                    <div class="small text-muted">{{ Str::limit($data['message'] ?? '', 60) }}</div>
-                                    <div class="small text-secondary">
-                                        {{ \Carbon\Carbon::parse($n->created_at)->locale('ja')->isoFormat('YYYY年M月D日(ddd) HH:mm') }}
-                                    </div>
-                                </div>
-                                @if(is_null($n->read_at))
-                                    <span class="badge bg-primary align-self-start">未読</span>
-                                @endif
-                            </a>
-                        @empty
-                            <div class="list-group-item text-muted small">通知はありません。</div>
-                        @endforelse
-                    @else
-                        {{-- recentNotifications を渡していない場合のプレースホルダ --}}
-                        <div class="list-group-item text-muted small">最新の通知を読み込みました。</div>
-                    @endisset
-                </div>
-
-                <div class="p-2 border-top text-end">
-                    <a href="{{ route('notifications.index') }}" class="btn btn-sm btn-link">すべて表示</a>
-                </div>
-            </div>
-        </div>
+            @endif
+        </a>
     </div>
 
-    {{-- ✅ ファミリーメンバーのアイコン表示 --}}
+    {{-- 家族名 / メンバー --}}
+    <h4 class="mb-0 text-dark">ようこそ、{{ $family->name ?? 'ゲスト' }} さん</h4>
+
     <div class="d-flex gap-2 mb-3">
-        @foreach (optional(auth()->user()->family)->users ?? [] as $member)
-            <img src="{{ $member->profile_image ? asset('storage/' . $member->profile_image) : 'https://placehold.co/80x80?text=%20' }}"
-                 alt="{{ $member->name }}"
-                 class="rounded-circle border" width="40" height="40">
-        @endforeach
+        @php $members = $familyMembers ?? collect(); @endphp
+        @forelse($members as $member)
+            <img
+                src="{{ $member->profile_image ? asset('storage/'.$member->profile_image) : 'https://placehold.co/80x80?text=%20' }}"
+                alt="{{ $member->name }}"
+                class="rounded-circle border"
+                width="40" height="40" loading="lazy">
+        @empty
+            <span class="text-muted">メンバー情報がありません。</span>
+        @endforelse
     </div>
 
-    {{-- 🔔 未読メッセージ通知（カード） --}}
-    @if(($unreadCount ?? 0) > 0)
-        <div id="unreadMessageAlert" class="alert alert-warning py-2 px-3 mb-3">
-            <i class="bi bi-bell-fill me-2"></i>
-            <span id="unreadMessageText">{{ $unreadCount }}件の未読メッセージがあります。</span>
-        </div>
-    @endif
-
-    {{-- 📅 今日の予定 --}}
-    <div class="card mb-3">
-        <div class="card-body">
-            <h5><i class="bi bi-calendar-event me-2"></i>今日の予定</h5>
-            @if(!empty($todayEvent))
-                <p>
-                    {{ \Carbon\Carbon::parse($todayEvent->event_time)->format('H:i') }}
-                    {{ $todayEvent->title }}
-                </p>
-            @else
-                <p class="text-muted">本日の予定はありません。</p>
-            @endif
-        </div>
-    </div>
-
-    {{-- 💬 最新メッセージ --}}
-    <div class="card mb-3">
-        <div class="card-body">
-            <h5><i class="bi bi-chat-dots me-2"></i>最新メッセージ</h5>
-            @if(!empty($latestMessage))
-                <p class="mb-0">「{{ Str::limit($latestMessage->content, 50) }}」<br>
-                    from {{ $latestMessage->sender->name }}</p>
-            @else
-                <p class="text-muted">新着メッセージはありません。</p>
-            @endif
-        </div>
-    </div>
-
-    {{-- 🧭 機能メニュー --}}
-    <div class="row text-center mb-4">
-        @foreach($menuItems as $item)
-            <div class="col-4 col-md-2 mb-3">
-                <a href="{{ route($item['route']) }}" class="text-decoration-none text-dark">
-                    <div class="position-relative">
-                        <i class="bi {{ $item['icon'] }} fs-2"></i>
-                        @if(($item['badge'] ?? 0) > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ $item['badge'] }}
-                            </span>
-                        @endif
+    {{-- 今日の予定（旧: Today’s Schedule） --}}
+    <section class="mb-4">
+        <h4 class="fw-bold mb-3 text-dark">今日の予定</h4>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                @if(!empty($todayEvent))
+                    <div class="d-flex align-items-start">
+                        <div class="fw-bold me-3 text-primary" style="min-width:72px;">
+                            {{ \Carbon\Carbon::parse($todayEvent->start_at ?? $todayEvent->event_time)->format('H:i') }}
+                        </div>
+                        <div class="fs-5 text-dark">
+                            {{ $todayEvent->title }}
+                            @if(!empty($todayEvent->memo))
+                                <span class="text-muted">（{{ $todayEvent->memo }}）</span>
+                            @endif
+                        </div>
                     </div>
-                    <div class="mt-1">{{ $item['label'] }}</div>
-                </a>
+                @else
+                    <div class="text-muted">本日の予定はありません。</div>
+                @endif
             </div>
-        @endforeach
-    </div>
+        </div>
+    </section>
 
-    {{-- 🧡 感謝ログ表示 --}}
-    <div class="text-center fs-5">
-        <span class="text-danger">❤️</span>
-        今日の「ありがとう」は <strong>{{ $gratitudeCount }}</strong> 件です。
-    </div>
+    {{-- 通知（旧: Notifications）※ダッシュボードに最新2件だけ軽く表示 --}}
+    <section class="mb-4">
+        @php $notifs = ($notifications ?? collect()); @endphp
+        <h4 class="fw-bold mb-3 text-dark">通知</h4>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                @forelse($notifs->take(2) as $n)
+                    @php $data = is_array($n->data ?? null) ? $n->data : []; @endphp
+                    <div class="mb-2">
+                        <i class="bi bi-dot"></i>
+                        <span class="text-dark">{{ $data['title'] ?? $n->title ?? 'お知らせ' }}</span>
+                        <span class="text-muted">{{ isset($data['message']) ? '：'.$data['message'] : '' }}</span>
+                    </div>
+                @empty
+                    <div class="text-muted">新しい通知はありません。</div>
+                @endforelse
+            </div>
+        </div>
+    </section>
+
+    {{-- 最近の写真投稿（旧: Photos） --}}
+    <section class="mb-4">
+        <h4 class="fw-bold mb-3 text-dark">最近の写真投稿</h4>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                @php $photoList = $photos ?? collect(); @endphp
+                @forelse($photoList as $photo)
+                    @php
+                        $path   = $photo->path ?? '';
+                        $exists = $path && \Illuminate\Support\Facades\Storage::disk('public')->exists($path);
+                        $src    = $exists ? \Illuminate\Support\Facades\Storage::url($path) : asset('images/placeholder.png');
+                    @endphp
+                    <img src="{{ $src }}" alt="{{ $photo->title ?? 'photo' }}"
+                         width="80" height="80" class="me-2 mb-2 rounded border"
+                         style="object-fit:cover" loading="lazy">
+                @empty
+                    <div class="text-muted">写真はまだありません。</div>
+                @endforelse
+            </div>
+        </div>
+    </section>
+
+    {{-- 最近のメッセージ（旧: Recent Messages） --}}
+    <section class="mb-5">
+        <h4 class="fw-bold mb-3 text-dark">最近のメッセージ</h4>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                @php $msgList = $messages ?? collect(); @endphp
+                @forelse($msgList->take(2) as $m)
+                    <div class="fs-6 mb-2">・{{ \Illuminate\Support\Str::limit($m->content, 60) }}</div>
+                @empty
+                    <div class="text-muted">メッセージはまだありません。</div>
+                @endforelse
+            </div>
+        </div>
+    </section>
+
+    {{-- メイン機能（旧: Feature Hub） --}}
+    @php
+        $unreadMsg  = $unreadMessageCount ?? 0;
+
+        // 表示するカードのみ（ご依頼の非表示項目は含めない）
+        // 非表示一覧：
+        //  お知らせ一覧 / 予定を追加 / タスクを追加 / カテゴリ追加 /
+        //  ファミリー情報 / 招待コード/送信 / 招待コードで参加 /
+        //  管理者:メンバー作成 / プロフィール編集 / 旧ペア機能
+        $features = [
+            ['label' => 'Family Chat',   'desc' => '家族チャット',   'icon' => 'bi-chat-dots',     'route' => route('messages.family'), 'badge' => $unreadMsg],
+            ['label' => 'Calendar',      'desc' => '予定一覧',       'icon' => 'bi-calendar-event','route' => route('calendar.index')],
+            ['label' => 'Tasks',         'desc' => 'タスク一覧',     'icon' => 'bi-check-square',  'route' => route('tasks.index')],
+            ['label' => 'Shopping List', 'desc' => '買い物リスト',   'icon' => 'bi-cart',          'route' => route('shopping.index')],
+            ['label' => 'Photos',        'desc' => '写真一覧・投稿', 'icon' => 'bi-image',         'route' => route('photos.index')],
+            ['label' => 'Videos',        'desc' => '動画一覧・投稿', 'icon' => 'bi-camera-video',  'route' => route('videos.index')],
+        ];
+    @endphp
+
+    {{-- メイン機能（横スクロール） --}}
+    <section class="mb-4">
+        <h4 class="fw-bold mb-3">メイン機能</h4>
+        <div class="d-flex flex-nowrap overflow-auto gap-3 pb-2">
+            {{-- 1カードあたり最小幅を指定してスライド可能に --}}
+            <a href="{{ route('messages.index') }}" class="text-decoration-none">
+            <div class="card text-center shadow-sm feature-card-minw">
+                <div class="card-body">
+                <div class="display-6">💬</div>
+                <div class="fw-bold mt-2">Family Chat</div>
+                <div class="text-muted small">家族チャット</div>
+                </div>
+            </div>
+            </a>
+
+            <a href="{{ route('calendar.index') }}" class="text-decoration-none">
+            <div class="card text-center shadow-sm feature-card-minw">
+                <div class="card-body">
+                <div class="display-6">📅</div>
+                <div class="fw-bold mt-2">Calendar</div>
+                <div class="text-muted small">予定一覧</div>
+                </div>
+            </div>
+            </a>
+
+            <a href="{{ route('tasks.index') }}" class="text-decoration-none">
+            <div class="card text-center shadow-sm feature-card-minw">
+                <div class="card-body">
+                <div class="display-6">✅</div>
+                <div class="fw-bold mt-2">Tasks</div>
+                <div class="text-muted small">タスク一覧</div>
+                </div>
+            </div>
+            </a>
+
+            <a href="{{ route('shopping.index') }}" class="text-decoration-none">
+            <div class="card text-center shadow-sm feature-card-minw">
+                <div class="card-body">
+                <div class="display-6">🛒</div>
+                <div class="fw-bold mt-2">Shopping List</div>
+                <div class="text-muted small">買い物リスト</div>
+                </div>
+            </div>
+            </a>
+
+            <a href="{{ route('photos.index') }}" class="text-decoration-none">
+            <div class="card text-center shadow-sm feature-card-minw">
+                <div class="card-body">
+                <div class="display-6">🖼️</div>
+                <div class="fw-bold mt-2">Photos</div>
+                <div class="text-muted small">写真一覧・投稿</div>
+                </div>
+            </div>
+            </a>
+
+            <a href="{{ route('videos.index') }}" class="text-decoration-none">
+            <div class="card text-center shadow-sm feature-card-minw">
+                <div class="card-body">
+                <div class="display-6">🎬</div>
+                <div class="fw-bold mt-2">Videos</div>
+                <div class="text-muted small">動画一覧・投稿</div>
+                </div>
+            </div>
+            </a>
+        </div>
+
+        {{-- 追加アクション（任意）：ログアウト --}}
+        <div class="text-end mt-3">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-box-arrow-right me-1"></i> Logout
+                </button>
+            </form>
+        </div>
+    </section>
 
 </div>
-
-{{-- ===== 通知のJS（未読数ポーリング + すべて既読の即時反映） ===== --}}
-<script>
-(function(){
-    const badge = document.getElementById('notif-badge');
-    const alertBox = document.getElementById('unreadMessageAlert');
-    const alertText = document.getElementById('unreadMessageText');
-
-    async function refreshUnreadCount() {
-        try {
-            const res = await fetch('{{ route('notifications.unread-count') }}', { credentials: 'same-origin' });
-            if (!res.ok) return;
-            const data = await res.json();
-            const count = Number(data.count || 0);
-
-            if (badge) {
-                if (count > 0) {
-                    badge.textContent = count;
-                    badge.classList.remove('d-none');
-                } else {
-                    badge.classList.add('d-none');
-                }
-            }
-            if (alertBox && alertText) {
-                if (count > 0) {
-                    alertText.textContent = `${count}件の未読メッセージがあります。`;
-                    alertBox.classList.remove('d-none');
-                } else {
-                    alertBox.classList.add('d-none');
-                }
-            }
-        } catch (e) { /* noop */ }
-    }
-
-    // すべて既読（ページ遷移なしで即時反映）
-    const markAllForm = document.getElementById('notifMarkAllForm');
-    if (markAllForm) {
-        markAllForm.addEventListener('submit', async (ev) => {
-            ev.preventDefault();
-            try {
-                const formData = new FormData(markAllForm);
-                const res = await fetch(markAllForm.action, {
-                    method: 'POST',
-                    body: formData,
-                    credentials: 'same-origin',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
-                if (res.ok) {
-                    // バッジとアラートをゼロ化
-                    if (badge) badge.classList.add('d-none');
-                    if (alertBox) alertBox.classList.add('d-none');
-                    // ドロップダウン内の未読バッジを消す
-                    document.querySelectorAll('#notifList .badge.bg-primary').forEach(el => el.remove());
-                }
-            } catch (e) { /* noop */ }
-        });
-    }
-
-    // 初回 & ポーリング
-    refreshUnreadCount();
-    setInterval(refreshUnreadCount, 20000); // 20秒ごと
-})();
-</script>
 @endsection

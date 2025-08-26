@@ -104,3 +104,12 @@
     justify-content: center;
     font-size: 28p;
 }
+
+.feature-card-minw {
+    min-width: 180px;
+} /* iPhone SEでも2枚目が見切れてスワイプ誘発 */
+@media (min-width: 576px) {
+    .feature-card-minw {
+        min-width: 220px;
+    }
+}
