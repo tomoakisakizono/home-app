@@ -9,12 +9,12 @@ class Calendar extends Model
 {
     use HasFactory;
 
-    // 🔹 テーブル名（デフォルトの `calendars` のため省略可能）
     protected $table = 'calendars';
 
-    // 🔹 一括代入を許可するカラム
+    // ✅ family_id を追加（これが無いと保存されない）
     protected $fillable = [
-        'pair_id',
+        'family_id',
+        'pair_id',     // ※将来廃止予定なら残してOK
         'user_id',
         'title',
         'event_date',
@@ -22,27 +22,31 @@ class Calendar extends Model
         'description',
     ];
 
-    // 🔹 event_date を `date` 型としてキャスト
+    // ✅ event_time は time型なので string で扱うのが安全
     protected $casts = [
         'event_date' => 'date',
-        'event_time' => 'datetime:H:i:s',
+        'event_time' => 'string',
     ];
 
-    // 🔹 ペアとのリレーション（多対一）
     public function pair()
     {
         return $this->belongsTo(Pair::class);
     }
-
-    // 🔹 ユーザーとのリレーション（多対一）
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // 🔹 メッセージとのリレーション（予定とメッセージを関連付ける）
-    public function messages()
+    // 便利アクセサ（“HH:mm”）
+    public function getEventTimeHmAttribute(): ?string
     {
-        return $this->hasMany(Message::class);
+        if (!$this->event_time) {
+            return null;
+        }
+        try {
+            return \Carbon\Carbon::createFromFormat('H:i:s', $this->event_time)->format('H:i');
+        } catch (\Throwable $e) {
+            return (string)$this->event_time; // 既存データが H:i の場合もそのまま
+        }
     }
 }

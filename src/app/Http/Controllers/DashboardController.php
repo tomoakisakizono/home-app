@@ -36,6 +36,8 @@ class DashboardController extends Controller
         if ($familyId) {
             $todayEvent = Calendar::where('family_id', $familyId)
                 ->whereDate('event_date', today())
+                ->orderBy('event_time')     // ✅ 追加
+                ->orderBy('id')
                 ->first();
 
             $latestMessage = Message::where('family_id', $familyId)
@@ -50,9 +52,12 @@ class DashboardController extends Controller
                 ->where('status', '!=', 'done')
                 ->count();
 
-            $photos = Photo::where('family_id', $familyId)
+            $photos = Photo::with(['images' => function ($q) {
+                $q->orderBy('id');   // 先頭を決める
+            }])
+                ->where('family_id', $familyId)
                 ->latest()
-                ->limit(5)
+                ->limit(8)
                 ->get();
 
             $messages = Message::where('family_id', $familyId)
