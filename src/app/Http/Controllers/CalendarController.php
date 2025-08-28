@@ -13,8 +13,11 @@ class CalendarController extends Controller
 {
     public function index()
     {
-        $events = Calendar::where('pair_id', $this->pair->id)
-            ->orderBy('event_date', 'asc')
+        $familyId = auth()->user()->family_id;
+
+        $events = Calendar::where('family_id', $familyId) // ✅ family 基準に変更
+            ->orderBy('event_date')
+            ->orderBy('event_time')
             ->get();
 
         return view('calendar.index', compact('events'));
@@ -24,21 +27,25 @@ class CalendarController extends Controller
     {
         DB::beginTransaction();
         try {
+            $auth = auth()->user();
+
             $calendar = Calendar::create([
-                'pair_id' => $this->pair->id,
-                'user_id' => $this->authUser->id,
-                'title' => $request->title,
-                'event_date' => $request->event_date,
-                'event_time' => $request->event_time,
+                'family_id'   => $auth->family_id,          // ✅ これが重要
+                'pair_id'     => $this->pair->id ?? null,   // 互換のため残してOK
+                'user_id'     => $auth->id,
+                'title'       => $request->title,
+                'event_date'  => $request->event_date,
+                'event_time'  => $request->event_time,
                 'description' => $request->description,
             ]);
 
-            $partner = User::where('pair_id', $this->pair->id)
-                        ->where('id', '!=', $this->authUser->id)
+            // 通知（既存ロジックのまま）
+            $partner = User::where('family_id', $auth->family_id)
+                        ->where('id', '!=', $auth->id)
                         ->first();
 
             if ($partner) {
-                $calendar->user = $this->authUser;
+                $calendar->user = $auth;
                 $partner->notify(new CalendarEventCreated($calendar));
             }
 
