@@ -68,7 +68,7 @@ Route::middleware('auth')->group(function () {
     // ----- メッセージ -----
     Route::prefix('messages')->name('messages.')->group(function () {
         // 一覧（まずは選択画面へ）
-        Route::get('/', fn () => redirect()->route('messages.select'))->name('index');
+        Route::get('/', [MessageController::class, 'index'])->name('index');
 
         // 家族全体チャット
         Route::get('/family', [MessageController::class, 'familyChat'])->name('family');
@@ -78,9 +78,6 @@ Route::middleware('auth')->group(function () {
 
         // 投稿
         Route::post('/', [MessageController::class, 'store'])->name('store');
-
-        // ルーティング上の「選択」ビュー（簡易）
-        Route::view('/select', 'messages.select')->name('select');
     });
 
     // ----- カレンダー -----

@@ -23,6 +23,41 @@
         footer { background: #0d6efd; color: white; padding: 10px; text-align: center; }
         .container { padding-bottom: 50px; }
     </style>
+    <style>
+    /* 今日の予定：時間を固定幅、タイトルを可変にして折り返しを最小化 */
+    .today-event{display:flex;align-items:center;gap:.5rem}
+    .today-event-time{flex:0 0 56px;font-weight:700;color:#0d6efd}
+    .today-event-title{flex:1;word-break:break-word}
+
+    /* 通知：行間を詰めて読みやすく */
+    .notice-list{list-style:none;padding-left:0;margin:0}
+    .notice-list li{margin: .25rem 0;line-height:1.35}
+
+    /* 最近の写真投稿：正方形サムネ */
+    .photo-thumb{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:.6rem;border:1px solid rgba(0,0,0,.08)}
+    /* カルーセル矢印のタップ領域を少し大きく */
+    .carousel-control-prev, .carousel-control-next{width:12%}
+
+    /* 最近のメッセージ：モバイルでの視認性 */
+    .recent-message{font-size:.95rem;line-height:1.35;margin-bottom:.35rem}
+    
+    /* 通知テーブル（PCは2列、スマホは縦積み） */
+    .table-notice td:first-child{width:6rem; white-space:nowrap; font-weight:700;}
+    .table-notice .notice-title{font-weight:600;}
+    .table-notice .notice-body{font-size:.95rem; line-height:1.4;}
+
+    /* iPhone SE 等の幅狭対策 */
+    @media (max-width: 360px){
+    .today-event-time{flex-basis:52px}    
+    .card .display-6{font-size:1.7rem} /* Featureカードの絵文字やアイコンが大き過ぎる場合の抑制 */
+    }
+
+    @media (max-width: 480px){
+    .table-notice tr{border-top:1px solid #dee2e6;}
+    .table-notice td{display:block; width:100%!important; border-top:0;}
+    .table-notice td:first-child{margin:.25rem 0 .1rem;}
+    }
+    </style>
 </head>
 <body>
 

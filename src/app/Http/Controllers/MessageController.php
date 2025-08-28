@@ -12,71 +12,114 @@ use App\Notifications\MessagePosted;
 
 class MessageController extends Controller
 {
-    // 全体または個別のメッセージを表示（旧構成は使わない）
-    public function index()
+    // ---- 共通でビューに渡す最低限のデータを作るヘルパ ----
+    private function buildCommonPayload()
     {
-        return redirect()->route('messages.select');
+        $auth   = auth()->user();
+        $family = $auth?->family;
+        $familyId = $family->id ?? null;
+
+        // メンバー（自分以外）
+        $members = $familyId
+            ? $family->users()->where('users.id', '!=', $auth->id)->get()
+            : collect();
+
+        // 自分宛の未読
+        $unreadCount = $familyId
+            ? Message::where('family_id', $familyId)
+                ->where('receiver_id', $auth->id)
+                ->where('is_read', false)
+                ->count()
+            : 0;
+
+        return [$auth, $family, $familyId, $members, $unreadCount];
     }
 
-    // 個別チャット（1対1）
-    public function userChat(User $user)
+    // 一覧（Family Chat の着地点）
+    public function index()
     {
-        $authId = auth()->id();
-        $familyId = auth()->user()->family_id;
+        [$auth, $family, $familyId, $members, $unreadCount] = $this->buildCommonPayload();
 
-        // 双方向のやり取りだけを取得
-        $messages = Message::where('family_id', $familyId)
-            ->where(function ($q) use ($authId, $user) {
-                $q->where(function ($q2) use ($authId, $user) {
-                    $q2->where('sender_id', $authId)
-                        ->where('receiver_id', $user->id);
-                })->orWhere(function ($q2) use ($authId, $user) {
-                    $q2->where('sender_id', $user->id)
-                        ->where('receiver_id', $authId);
-                });
-            })
-        ->orderBy('created_at')
-        ->get();
+        $messages = $familyId
+            ? Message::where('family_id', $familyId)
+                ->orderBy('created_at')   // 家族全体＋個別を混在表示するなら orderBy のみに
+                ->limit(100)->get()
+            : collect();
 
         return view('messages.index', [
-            'messages' => $messages,
-            'chatPartner' => $user,
+            'family'      => $family,
+            'members'     => $members,
+            'messages'    => $messages,
+            'unreadCount' => $unreadCount,
+            'chatPartner' => null,   // 一覧/家族チャットの時は null
         ]);
     }
 
     // 家族全体チャット
     public function familyChat()
     {
-        $familyId = auth()->user()->family_id;
+        [$auth, $family, $familyId, $members, $unreadCount] = $this->buildCommonPayload();
 
-        $messages = Message::where('family_id', $familyId)
-            ->whereNull('receiver_id')
-            ->orderBy('created_at')
-            ->get();
+        $messages = $familyId
+            ? Message::where('family_id', $familyId)
+                ->whereNull('receiver_id')
+                ->orderBy('created_at')
+                ->limit(100)->get()
+            : collect();
 
         return view('messages.index', [
-            'messages' => $messages,
+            'family'      => $family,
+            'members'     => $members,
+            'messages'    => $messages,
+            'unreadCount' => $unreadCount,
             'chatPartner' => null,
         ]);
     }
 
-    // メッセージ送信（全体 or 個別）
+    // 個別チャット
+    public function userChat(User $user)
+    {
+        [$auth, $family, $familyId, $members, $unreadCount] = $this->buildCommonPayload();
+
+        $messages = $familyId
+            ? Message::where('family_id', $familyId)
+                ->where(function ($q) use ($auth, $user) {
+                    $q->where(function ($q2) use ($auth, $user) {
+                        $q2->where('sender_id', $auth->id)
+                           ->where('receiver_id', $user->id);
+                    })->orWhere(function ($q2) use ($auth, $user) {
+                        $q2->where('sender_id', $user->id)
+                           ->where('receiver_id', $auth->id);
+                    });
+                })
+                ->orderBy('created_at')
+                ->limit(100)->get()
+            : collect();
+
+        return view('messages.index', [
+            'family'      => $family,
+            'members'     => $members,
+            'messages'    => $messages,
+            'unreadCount' => $unreadCount,
+            'chatPartner' => $user,
+        ]);
+    }
+
+    // 送信
     public function store(MessageRequest $request)
     {
         DB::beginTransaction();
-
         try {
-            $authUser = auth()->user();
+            $auth = auth()->user();
 
             $message = Message::create([
-                'sender_id'   => $authUser->id,
+                'sender_id'   => $auth->id,
                 'receiver_id' => $request->receiver_id ?? null,
-                'family_id'   => $authUser->family_id,
+                'family_id'   => $auth->family_id,
                 'content'     => $request->content,
                 'is_read'     => false,
             ]);
 
-            // 通知処理
             if ($message->receiver_id) {
                 $receiver = User::find($message->receiver_id);
                 if ($receiver) {
@@ -96,7 +139,7 @@ class MessageController extends Controller
         }
     }
 
-    // メッセージ編集（自分のメッセージのみ）
+    // 編集画面
     public function edit($id)
     {
         $message = Message::where('id', $id)
@@ -106,7 +149,7 @@ class MessageController extends Controller
         return view('messages.edit', compact('message'));
     }
 
-    // メッセージ更新
+    // 更新（❗️行き先を messages.index に変更）
     public function update(MessageRequest $request, $id)
     {
         $message = Message::where('id', $id)
@@ -115,10 +158,10 @@ class MessageController extends Controller
 
         $message->update(['content' => $request->content]);
 
-        return redirect()->route('messages.select')->with('success', 'メッセージを更新しました！');
+        return redirect()->route('messages.index')->with('success', 'メッセージを更新しました！');
     }
 
-    // メッセージ削除
+    // 削除（❗️行き先を messages.index に変更）
     public function destroy($id)
     {
         $message = Message::where('id', $id)
@@ -127,6 +170,6 @@ class MessageController extends Controller
 
         $message->delete();
 
-        return redirect()->route('messages.select')->with('success', 'メッセージを削除しました！');
+        return redirect()->route('messages.index')->with('success', 'メッセージを削除しました！');
     }
 }
