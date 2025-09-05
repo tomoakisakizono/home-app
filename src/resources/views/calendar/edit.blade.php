@@ -22,7 +22,7 @@
 
             <div class="mb-3">
                 <label for="event_time" class="form-label">時間</label>
-                <input type="time" name="event_time" id="event_time" class="form-control" value="{{ old('event_time', optional($event->event_time)->format('H:i')) }}">
+                <input type="time" name="event_time" id="event_time" class="form-control" value="{{ old('event_time', $event->event_time ? \Carbon\Carbon::parse($event->event_time)->format('H:i') : '') }}">
             </div>
 
             <div class="mb-3">

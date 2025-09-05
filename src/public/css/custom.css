@@ -1,28 +1,36 @@
-@media (max-width: 768px) {
-    .pair-info {
-        font-size: 12px !important;
-        white-space: nowrap;
-    }
+/* ============================================================================
+  Design tokens
+============================================================================ */
+:root {
+    /* brand */
+    --brand-green: #198754;
+    --brand-green-ink: #0f5132;
+    --brand-blue: #0d6efd;
+
+    /* neutrals */
+    --ink-muted: #6c757d;
+    --border: #eee;
+    --ring: rgba(0, 0, 0, 0.1);
+    --shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
+
+    /* surfaces */
+    --card-bg: #fff;
+    --chip-bg: #e7f3ee;
+
+    /* radius / spacing */
+    --radius-xl: 15px;
+    --radius-full: 999px;
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
 }
 
+/* ============================================================================
+  Utilities (小さめの共通ユーティリティ)
+============================================================================ */
 .text-left {
     text-align: left !important;
-}
-
-.category-btn {
-    flex: 1; /* ボタンの幅を均等にする */
-    min-width: 18%; /* 5つのボタンが1行に収まるよう調整 */
-    max-width: 20%;
-    font-size: 12px; /* 文字を小さくする */
-    padding: 6px 4px; /* ボタンの内側余白を調整 */
-    text-align: center;
-    white-space: nowrap; /* 文字の改行を防ぐ */
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.d-flex {
-    gap: 4px; /* ボタン間の隙間を調整 */
 }
 
 .auto-font-size {
@@ -30,21 +38,38 @@
     white-space: nowrap;
 }
 
-.menu-label {
-    font-size: 0.85rem; /* 少し小さく */
-    max-width: 100%;
-    overflow: hidden;
+/* gap ユーティリティ（広域 .d-flex への上書きは避ける） */
+.gap-1 {
+    gap: var(--space-1);
+}
+.gap-2 {
+    gap: var(--space-2);
 }
 
+/* 小さめラベル */
+.menu-label {
+    font-size: 0.85rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ============================================================================
+  Header / Dropdowns
+============================================================================ */
 #notificationDropdown + .dropdown-menu {
-    left: auto !important;
     right: 0 !important;
+    left: auto !important;
     top: 100% !important;
 }
 
+/* ============================================================================
+  Cards / Avatars
+============================================================================ */
 .card {
-    border-radius: 15px;
-    border: 1px solid #eee;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+    background: var(--card-bg);
 }
 
 .rounded-circle {
@@ -52,20 +77,18 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+/* ============================================================================
+  Login page
+  - 重複・競合を整理（background は一度だけ指定）
+============================================================================ */
 .login-page {
-    background-image: url("images/main-visual.jpg");
-    background-size: cover;
-    background-position: center;
-    position: relative;
+    min-height: 100vh;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: flex-start;
     padding-left: 5%;
-
-    display: flex;
-    flex-wrap: wrap;
-    min-height: 100vh;
-    background-color: #f9f9f9;
+    background: url("images/main-visual.jpg") center/cover no-repeat, #f9f9f9;
 }
 
 .left-textbox {
@@ -85,7 +108,7 @@
 }
 
 .login-box {
-    background-color: #ffffff;
+    background: #fff;
     padding: 2rem;
     border-radius: 1rem;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
@@ -98,18 +121,165 @@
     height: 60px;
     border-radius: 50%;
     object-fit: cover;
-    background-color: #f1f3f5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28p;
+    background: #f1f3f5;
+    display: grid;
+    place-items: center;
+    font-size: 28px; /* typo: 28p → 28px */
 }
 
+/* ============================================================================
+  Feature cards
+============================================================================ */
 .feature-card-minw {
     min-width: 180px;
-} /* iPhone SEでも2枚目が見切れてスワイプ誘発 */
+} /* iPhone SE でも 2枚目が見切れずスワイプを誘発 */
 @media (min-width: 576px) {
     .feature-card-minw {
         min-width: 220px;
+    }
+}
+
+/* ============================================================================
+  Category buttons row
+============================================================================ */
+.category-row {
+    display: flex;
+    gap: var(--space-1);
+}
+.category-btn {
+    flex: 1 1 18%;
+    max-width: 20%;
+    min-width: 18%;
+    font-size: 12px;
+    padding: 6px 4px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+@media (max-width: 768px) {
+    .pair-info {
+        font-size: 12px;
+        white-space: nowrap;
+    }
+}
+
+/* ============================================================================
+  Floating Action Button / Bottom Sheet
+============================================================================ */
+.hc-fab {
+    position: fixed;
+    right: 16px;
+    bottom: 88px;
+    z-index: 1050;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full);
+    display: grid;
+    place-items: center;
+    box-shadow: var(--shadow);
+}
+
+.hc-bottom-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1040;
+    background: #fff;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.12);
+    padding: 12px 16px 24px;
+}
+.hc-bottom-sheet .hc-handle {
+    width: 40px;
+    height: 4px;
+    background: #dee2e6;
+    border-radius: var(--radius-full);
+    margin: 6px auto 12px;
+}
+.hc-bottom-sheet .hc-date {
+    font-weight: 700;
+}
+.hc-empty {
+    color: var(--ink-muted);
+}
+
+/* ============================================================================
+  FullCalendar – 共通見た目
+============================================================================ */
+.fc .fc-toolbar-title {
+    font-weight: 700;
+}
+.fc .fc-daygrid-day-number {
+    font-weight: 600;
+}
+
+/* 予定ありドット（必要時にセルへ .hc-has-dot を付与） */
+.hc-has-dot {
+    position: relative;
+}
+.hc-has-dot::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 6px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brand-green);
+}
+
+/* 月表示のピル（時間＋タイトル） */
+.fc .fc-daygrid-event {
+    border: 0;
+    padding: 0;
+}
+.fc .fc-daygrid-event .hc-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.18rem 0.5rem;
+    border-radius: var(--radius-full);
+    background: var(--chip-bg);
+    color: var(--brand-green-ink);
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap; /* 1行で収める */
+}
+.fc .fc-daygrid-event .hc-time {
+    font-variant-numeric: tabular-nums;
+}
+.fc .fc-more-link {
+    font-weight: 700;
+}
+
+/* 週ビュー（timeGrid）の可読性 */
+.fc-timegrid-event .fc-event-main {
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+/* ポップオーバー幅（more の展開） */
+.fc-popover {
+    min-width: 260px;
+}
+
+/* モバイル最適化（SE 幅〜） */
+@media (max-width: 575.98px) {
+    .fc .fc-daygrid-day-frame {
+        padding: 2px 4px;
+    }
+    .fc .fc-daygrid-day-events {
+        margin-top: 2px;
+    }
+    .fc .fc-daygrid-event .hc-pill {
+        font-size: 0.8rem;
+        padding: 0.14rem 0.45rem;
+    }
+    .fc .fc-toolbar-title {
+        font-size: 1.1rem;
     }
 }
