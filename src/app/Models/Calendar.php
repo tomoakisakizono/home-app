@@ -2,51 +2,45 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Calendar extends Model
 {
-    use HasFactory;
-
     protected $table = 'calendars';
 
-    // ✅ family_id を追加（これが無いと保存されない）
     protected $fillable = [
         'family_id',
-        'pair_id',     // ※将来廃止予定なら残してOK
+        'pair_id',      // 互換で残すならOK（未使用なら削除可）
         'user_id',
         'title',
         'event_date',
-        'event_time',
+        'event_time',   // "HH:MM" or null
         'description',
     ];
 
-    // ✅ event_time は time型なので string で扱うのが安全
     protected $casts = [
-        'event_date' => 'date',
-        'event_time' => 'string',
+        'event_date' => 'date', // Carbon にキャスト
     ];
 
-    public function pair()
+    /**
+     * 表示用アクセサ：常に "HH:MM" を返す（秒は切る）
+     */
+    public function getEventTimeHiAttribute(): ?string
     {
-        return $this->belongsTo(Pair::class);
-    }
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    // 便利アクセサ（“HH:mm”）
-    public function getEventTimeHmAttribute(): ?string
-    {
-        if (!$this->event_time) {
+        $t = $this->attributes['event_time'] ?? null;
+        if (!$t) {
             return null;
         }
+
+        $s = (string)$t;
+        if (preg_match('/^\d{2}:\d{2}/', $s)) {
+            return substr($s, 0, 5); // "HH:MM(:SS)" → "HH:MM"
+        }
         try {
-            return \Carbon\Carbon::createFromFormat('H:i:s', $this->event_time)->format('H:i');
+            return Carbon::parse($s)->format('H:i');
         } catch (\Throwable $e) {
-            return (string)$this->event_time; // 既存データが H:i の場合もそのまま
+            return substr($s, 0, 5);
         }
     }
 }
